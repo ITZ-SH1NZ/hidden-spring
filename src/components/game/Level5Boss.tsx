@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useGame } from "@/app/game/GameContext";
+import { playSound } from "@/utils/sound";
 
 interface Projectile {
   id: number;
@@ -77,6 +78,7 @@ export default function Level5Boss() {
 
            if (newHp <= 0) {
               clearTimeout(attackSeqRef.current as any);
+              playSound("boss_phase");
               setBossDefeatedAnim(true);
               setFighterState("IDLE");
               setTimeout(() => {
@@ -138,6 +140,7 @@ export default function Level5Boss() {
       if ((keys.current["Space"] || keys.current[" "]) && time - lastShot.current > 300) {
          projRef.current.push({ id: time, x: pRef.current.x, y: 80, isEnemy: false });
          lastShot.current = time;
+         playSound("shoot");
       }
 
       // Boss Shoot
@@ -169,6 +172,7 @@ export default function Level5Boss() {
          if (!p.isEnemy && Math.abs(p.y - 10) < 6 && Math.abs(p.x - bRef.current.x) < 10) {
             pRef.current.bossHp = Math.max(0, pRef.current.bossHp - 2);
             setBossHp(pRef.current.bossHp);
+            playSound("boss_hit");
             if (pRef.current.bossHp <= 0) {
                nextPhaseTrigger = true;
             }
@@ -179,6 +183,7 @@ export default function Level5Boss() {
          if (p.isEnemy && Math.abs(p.y - 90) < 5 && Math.abs(p.x - pRef.current.x) < 5) {
             if (time - lastHit.current > 1000) {
                loseLife();
+               playSound("boss_hit");
                hit = true;
                setFlash(true);
                lastHit.current = time;
@@ -195,6 +200,7 @@ export default function Level5Boss() {
          setProjectiles([]);
          projRef.current = [];
          setPhase(1.5);
+         playSound("boss_phase");
          showDialog("SHELL CRACKED.\nTHE GREY KING DESCENDS.", "system");
       }
       } // End Phase 1 logic block
@@ -515,7 +521,7 @@ export default function Level5Boss() {
                     className="absolute bottom-[15%] px-10 py-4 border-4 border-black text-black font-black hover:bg-black hover:text-white transition-all hover:tracking-[0.3em] tracking-widest animate-pulse min-w-[250px]"
                     onClick={() => {
                         if (phase4TextIdx < 2) setPhase4TextIdx(p => p + 1);
-                        else setScene("ending");
+                        else { playSound("win"); setScene("ending"); }
                     }}
                  >
                     {phase4TextIdx < 2 ? '[ NEXT EVENT ]' : '[ INITIALIZE PROTOCOL ]'}

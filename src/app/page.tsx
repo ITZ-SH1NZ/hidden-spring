@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { playSound } from "@/utils/sound";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import MagneticButton from "@/components/ui/MagneticButton";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 import HeroSection from "@/components/sections/HeroSection";
 import HorizontalWorld from "@/components/sections/HorizontalWorld";
 import FlashlightEgg from "@/components/sections/FlashlightEgg";
@@ -33,19 +35,75 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","KeyB","KeyA"];
+
 export default function Home() {
   const mainRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // Scroll progress bar
+  const [scrollPct, setScrollPct] = useState(0);
+
+  // Konami
+  const [konamiActive, setKonamiActive] = useState(false);
+  const konamiBuf = useRef<string[]>([]);
+
+  // Fake global egg counter
+  const [eggCount, setEggCount] = useState(12847);
+
+  // Game navigation with loading screen
+  const [navigatingToGame, setNavigatingToGame] = useState(false);
+  const goToGame = () => setNavigatingToGame(true);
+
   useEffect(() => {
+    const onScroll = () => {
+      const el = document.documentElement;
+      const scrolled = el.scrollTop;
+      const total = el.scrollHeight - el.clientHeight;
+      setScrollPct(total > 0 ? (scrolled / total) * 100 : 0);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      konamiBuf.current = [...konamiBuf.current, e.code].slice(-KONAMI.length);
+      if (konamiBuf.current.join(",") === KONAMI.join(",")) {
+        playSound("konami");
+        setKonamiActive(true);
+        setTimeout(() => setKonamiActive(false), 3000);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const delay = Math.random() * 1000 + 2000; // 2–3s
+      setTimeout(() => setEggCount(prev => prev + Math.floor(Math.random() * 3) + 1), delay);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const alreadyLoaded = sessionStorage.getItem('hs:loaded') === '1';
+
+    if (alreadyLoaded) {
+      // Back-navigation: show nav immediately, no animation needed
+      gsap.set(".nav-item", { opacity: 1, y: 0 });
+      return;
+    }
+
+    // Fresh load: hide nav and wait for the loading screen to signal completion
+    gsap.set(".nav-item", { opacity: 0, y: -20 });
+
     const runIntro = () => {
-      const ctx = gsap.context(() => {
-        gsap.fromTo(".nav-item",
-          { y: -20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }
-        );
-      }, mainRef);
-      return () => ctx.revert();
+      sessionStorage.setItem('hs:loaded', '1');
+      gsap.to(".nav-item", {
+        y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out"
+      });
     };
 
     window.addEventListener('hiddenspring:loaded', runIntro, { once: true });
@@ -61,8 +119,63 @@ export default function Home() {
   };
 
   return (
+    <>
+    {navigatingToGame && (
+      <LoadingScreen
+        onComplete={() => router.push('/game')}
+        messages={["Entering the warren...", "Waking the Grey King...", "Loading the garden...", "Arming the Easter Bug...", "Almost there..."]}
+      />
+    )}
     <main ref={mainRef} className="bg-[#1A1A1A] w-full min-h-screen">
-      
+
+      {/* Scroll Progress Bar */}
+      <div
+        className="fixed top-0 left-0 h-[3px] bg-easter-hotpink z-[999] pointer-events-none transition-none"
+        style={{ width: `${scrollPct}%` }}
+      />
+
+      {/* Konami Easter Egg Overlay */}
+      <AnimatePresence>
+        {konamiActive && (
+          <motion.div
+            className="fixed inset-0 z-[9998] flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="relative text-center">
+              {/* Confetti dots */}
+              {Array.from({ length: 20 }).map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute rounded-full pointer-events-none"
+                  style={{
+                    width: 8 + (i % 4) * 4,
+                    height: 8 + (i % 4) * 4,
+                    backgroundColor: ["#FF69B4","#FFD700","#98FB98","#87CEEB","#DDA0DD"][i % 5],
+                    left: `${(i * 5.2) % 100}%`,
+                    top: `${(i * 7.3) % 100}%`,
+                  }}
+                  animate={{ y: [0, -30, 0], opacity: [1, 1, 0] }}
+                  transition={{ duration: 1.5, repeat: 1, delay: i * 0.05 }}
+                />
+              ))}
+              <motion.div
+                className="bg-[#0A0A0A] border-4 border-easter-hotpink px-10 py-8 font-mono"
+                initial={{ scale: 0.7, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.7, y: 20 }}
+              >
+                <div className="text-4xl mb-2">🐣</div>
+                <div className="text-easter-hotpink font-black text-2xl tracking-widest uppercase">YOU FOUND THE EASTER EGG!</div>
+                <div className="text-white/50 text-sm mt-2 tracking-widest">The Grey King never saw this coming.</div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* GLASSS NAV */}
       <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-[100] mix-blend-difference text-white pointer-events-none">
         <a href="#hero" onClick={(e) => handleScroll(e, '#hero')} className="nav-item flex items-center gap-3 font-black text-2xl tracking-tighter pointer-events-auto hover:opacity-80 transition-opacity">
@@ -75,12 +188,12 @@ export default function Home() {
           <a href="#play" onClick={(e) => handleScroll(e, '#play')} className="hover:opacity-50 transition-opacity">Play</a>
         </div>
         <div className="nav-item pointer-events-auto">
-          <MagneticButton onClick={() => router.push('/game')} color="black" className="px-6 py-2 text-sm !border-2 !border-white/50 hover:!border-white transition-colors bg-black/80 backdrop-blur-md">Play Now</MagneticButton>
+          <MagneticButton onClick={goToGame} color="black" className="px-6 py-2 text-sm !border-2 !border-white/50 hover:!border-white transition-colors bg-black/80 backdrop-blur-md">Play Now</MagneticButton>
         </div>
       </nav>
 
       {/* --- GAMIFIED HERO --- */}
-      <HeroSection />
+      <HeroSection onPlay={goToGame} />
 
       {/* --- SCROLL HATCH STORY --- */}
       <ScrollHatch />
@@ -136,7 +249,7 @@ export default function Home() {
       <HorizontalWorld />
 
       {/* --- FLASHLIGHT INTERACTIVE --- */}
-      <FlashlightEgg />
+      <FlashlightEgg onPlay={goToGame} />
 
       {/* --- INFINITE MARQUEE --- */}
       <section className="relative w-full py-16 bg-easter-hotpink overflow-hidden z-10 flex text-[#1A1A1A] border-y-[8px] border-black">
@@ -153,6 +266,16 @@ export default function Home() {
         </motion.div>
       </section>
 
+      {/* --- GLOBAL EGG COUNTER --- */}
+      <div className="relative w-full bg-[#0A0A0A] border-y-4 border-black py-6 flex items-center justify-center z-10">
+        <div className="font-mono text-center">
+          <span className="text-easter-hotpink font-black text-3xl md:text-4xl tracking-widest drop-shadow-[0_0_15px_#FF69B4]">
+            {eggCount.toLocaleString()}
+          </span>
+          <span className="text-white/50 font-bold tracking-[0.3em] uppercase text-sm ml-4">EGGS CRACKED GLOBALLY</span>
+        </div>
+      </div>
+
       {/* --- PLAYABLE MICRO-GAME WIDGET --- */}
       <PlayableGrid />
 
@@ -162,7 +285,7 @@ export default function Home() {
           <h2 className="text-[clamp(4rem,10vw,10rem)] font-black text-gray-900 leading-[0.9] mb-12 tracking-tighter text-outline-sm drop-shadow-[0_8px_0_#FF69B4]">
             HATCH IT.
           </h2>
-          <MagneticButton onClick={() => router.push('/game')} color="pink" className="text-[clamp(1.5rem,3vw,3rem)] px-16 py-8 shadow-[8px_8px_0_0_#1A1A1A]">
+          <MagneticButton onClick={goToGame} color="pink" className="text-[clamp(1.5rem,3vw,3rem)] px-16 py-8 shadow-[8px_8px_0_0_#1A1A1A]">
             Play Beta
           </MagneticButton>
         </div>
@@ -173,5 +296,6 @@ export default function Home() {
       {/* Global Noise Applied via CSS */}
       <div className="noise-overlay" />
     </main>
+    </>
   );
 }

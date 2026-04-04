@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useGame } from "../../app/game/GameContext";
+import { playSound } from "@/utils/sound";
 
 const MOCK_ENEMY = { id: "mock", name: "The Hollow Hare", maxHp: 60, hp: 60, sprite: "boss", color: "#AAAAAA", mechanic: "tank" };
 
 export default function BattleScreen() {
-  const { currentEnemy: rawEnemy, playerHp, playerMaxHp, takeDamage, endBattle, heal, timeRemaining, addCharge, resetCharge, ultimateCharge } = useGame();
+  const { currentEnemy: rawEnemy, playerHp, playerMaxHp, takeDamage, endBattle, addCharge, resetCharge, ultimateCharge } = useGame();
   const currentEnemy = rawEnemy ?? MOCK_ENEMY;
 
   const [enemyHp, setEnemyHp] = useState(currentEnemy.maxHp);
@@ -34,6 +35,7 @@ export default function BattleScreen() {
     if (turn !== "player") return;
 
     if (action === "strike") {
+      playSound("shoot");
       setPlayerAnim("attack");
       addCharge();
       addLog("> You lunge with the Carrot Blade.");
@@ -46,6 +48,7 @@ export default function BattleScreen() {
       }, 500);
     } 
     else if (action === "bomb") {
+      playSound("shoot");
       setPlayerAnim("attack");
       addCharge();
       addLog("> You hurl a Plasma Yolk.");
@@ -101,13 +104,14 @@ export default function BattleScreen() {
     setTurn("enemy");
   };
 
-  const checkStateAfterPlayerTurn = (dmgDealt: number) => {
+  const checkStateAfterPlayerTurn = (_dmgDealt: number) => {
     // Rely on current state snapshot (React batches updates but closures trap old values, so we approximate or use effect. Since we used functional update for enemyHp, we can't reliably read it here synchronously. We will use useEffect for death checking.)
   };
 
   useEffect(() => {
     if (enemyHp <= 0 && turn !== "end") {
       setTurn("end");
+      playSound("defeat_enemy");
       addLog(">> GUARDIAN DEFEATED. COLOUR RESTORED.");
       setTimeout(() => endBattle(true), 2000);
     }
@@ -116,6 +120,7 @@ export default function BattleScreen() {
   useEffect(() => {
     if (playerHp <= 0 && turn !== "end") {
       setTurn("end");
+      playSound("gameover");
       addLog(">> SHELL SHATTERED. COLOUR FADING.");
       setTimeout(() => endBattle(false), 2000);
     }
@@ -135,6 +140,7 @@ export default function BattleScreen() {
           } else {
             addLog(`>> You took ${dmg} DMG.`);
           }
+          playSound("hit");
           takeDamage(dmg);
           setPlayerAnim("hurt");
           setShieldActive(false);

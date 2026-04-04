@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useGame } from "../../app/game/GameContext";
+import { playSound } from "@/utils/sound";
 
 // 0: Floor
 // 1: Wall
@@ -36,7 +37,7 @@ const MAP_HEIGHT = OVERWORLD_MAP.length;
 const MAP_WIDTH = OVERWORLD_MAP[0].length;
 
 export default function RPGOverworld() {
-  const { playerPos, setPlayerPos, setScene, startBattle, showDialog, loseLife, lives, timeRemaining, defeatedEnemies, checkedEggs, markEggChecked, setGameClues, gameClues, correctEggId, setCorrectEggId } = useGame();
+  const { playerPos, setPlayerPos, setScene, startBattle, showDialog, loseLife, defeatedEnemies, checkedEggs, markEggChecked, setGameClues, gameClues, correctEggId, setCorrectEggId } = useGame();
   
   const [activeEnemies, setActiveEnemies] = useState<{x:number, y:number, type:number, id:string}[]>([]);
   const [activeEggs, setActiveEggs] = useState<{x:number, y:number, id:string, isCorrect:boolean}[]>([]);
@@ -131,6 +132,7 @@ export default function RPGOverworld() {
             if (type === 4) enemyMeta = { name: "The Rot", hp: 30, color: "#7FBF3F", mechanic: "evade" };
             if (type === 5) enemyMeta = { name: "The Frost Shell", hp: 40, color: "#88CCFF", mechanic: "drain" };
 
+            playSound("ui_click");
             startBattle({
               id: activeEnemies[enemyIdx].id,
               name: enemyMeta.name,
@@ -149,6 +151,7 @@ export default function RPGOverworld() {
           }
 
           // Move player
+          playSound("move");
           setPlayerPos({ x: nx, y: ny, dir });
         }
       } else {
@@ -177,9 +180,11 @@ export default function RPGOverworld() {
       const egg = activeEggs[foundEggIndex];
       // Interact with egg
       if (egg.isCorrect) {
+        playSound("crack_good");
         showDialog("SPRING EGG FOUND! THE WARREN CRACKS OPEN.");
         setTimeout(() => setScene("level_complete"), 2000);
       } else {
+        playSound("crack_bad");
         loseLife();
         markEggChecked(egg.id);
         const newEggs = [...activeEggs];

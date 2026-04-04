@@ -16,6 +16,8 @@ import Level4Forge from "@/components/game/Level4Forge";
 import Level5Boss from "@/components/game/Level5Boss";
 import EndingScreen from "@/components/game/EndingScreen";
 import MobileJoypad from "@/components/game/MobileJoypad";
+import PauseMenu from "@/components/game/PauseMenu";
+import SceneTransition from "@/components/game/SceneTransition";
 
 const DEV_SCENES: { label: string; scene: SceneType }[] = [
   { label: "Lore 1",    scene: "lore"           },
@@ -138,6 +140,8 @@ function SceneRouter() {
       {scene === "ending" && <EndingScreen />}
       
       <BrutalistDialog />
+      <PauseMenu />
+      <SceneTransition />
       <DevSkip />
       </div>
 

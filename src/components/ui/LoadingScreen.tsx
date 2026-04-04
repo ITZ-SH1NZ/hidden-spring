@@ -4,12 +4,17 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
-export default function LoadingScreen() {
+interface LoadingScreenProps {
+  onComplete?: () => void;
+  messages?: string[];
+}
+
+export default function LoadingScreen({ onComplete, messages }: LoadingScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState("Waking the bunny...");
+  const [statusText, setStatusText] = useState("");
 
-  const statusMessages = [
+  const statusMessages = messages ?? [
     "Waking the bunny...",
     "Painting the eggs...",
     "Hiding the tokens...",
@@ -18,6 +23,7 @@ export default function LoadingScreen() {
   ];
 
   useEffect(() => {
+    setStatusText(statusMessages[0]);
     const duration = 2800;
     const interval = 30;
     const steps = duration / interval;
@@ -30,7 +36,6 @@ export default function LoadingScreen() {
       const p = Math.min(eased * 100, 100);
       setProgress(p);
 
-      // Cycle status messages
       const msgIndex = Math.min(Math.floor((p / 100) * statusMessages.length), statusMessages.length - 1);
       setStatusText(statusMessages[msgIndex]);
 
@@ -38,10 +43,15 @@ export default function LoadingScreen() {
         clearInterval(timer);
         setTimeout(() => {
           setIsVisible(false);
-          // Signal all other components that loading is complete
-          setTimeout(() => {
-            window.dispatchEvent(new CustomEvent('hiddenspring:loaded'));
-          }, 1050); // after the 1s clip-path wipe-up exit
+          if (onComplete) {
+            // Navigate immediately — exit animation plays during the route transition
+            onComplete();
+          } else {
+            // Default: signal landing page components after the wipe-up finishes
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('hiddenspring:loaded'));
+            }, 1050);
+          }
         }, 400);
       }
     }, interval);

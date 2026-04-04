@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useGame } from "@/app/game/GameContext";
+import { playSound } from "@/utils/sound";
 
 interface Entity {
   id: number;
@@ -109,6 +110,7 @@ export default function Level4Forge() {
             playerRef.current.y = Math.max(0, Math.min(10, playerRef.current.y + dy));
             setPlayer({ ...playerRef.current });
             lastMoveTime.current = time;
+            playSound("move");
          }
       }
 
@@ -137,6 +139,8 @@ export default function Level4Forge() {
       // Hit Terminal?
       if (py === 0) {
          dialogActiveRef.current = true;
+         playSound("collect");
+         playSound("level_complete");
          showDialog("[ FACTORY OVERRIDE COMPLETE — ESCAPE! ]", "system");
          setTimeout(() => {
             setScene("lore5");
@@ -146,6 +150,7 @@ export default function Level4Forge() {
 
       // Hit Stamper?
       if (py === 5 && stampActive) {
+         playSound("hit");
          loseLife();
          showDialog("CRUSHED BY THE STAMPER. REFORMING.", "system");
          resetPosition();
@@ -164,6 +169,7 @@ export default function Level4Forge() {
       });
 
       if (hit) {
+         playSound("hit");
          loseLife();
          showDialog("PACKAGED INTO A GREY BOX. REFORMING.", "system");
          resetPosition();

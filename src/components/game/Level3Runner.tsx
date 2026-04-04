@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useGame } from "../../app/game/GameContext";
+import { playSound } from "@/utils/sound";
 
 interface Obstacle {
   id: number;
@@ -136,11 +137,12 @@ export default function Level3Runner() {
 
                    // Pause game loop logic
                    isPaused.current = true;
-                   
+
                    phaseRef.current += 1;
                    setPhase(phaseRef.current);
                    isSpawningNode.current = false;
-                   
+
+                   playSound("crack_good");
                    setFlash(true);
                    setBreachText(`GREY BARRIER ${phaseRef.current - 1} SHATTERED`);
                    setCameraShake(true);
@@ -161,12 +163,14 @@ export default function Level3Runner() {
                    }, 2000); // Wait 2s before resuming
 
                    if (phaseRef.current > 3) {
+                      playSound("level_complete");
                       shouldCancelLoop = true;
                       setScene("lore4");
                    }
                 }
              } else if (!isHitRef.current) {
                 isHitRef.current = true;
+                playSound("crack_bad");
                 loseLife();
                 showDialog("WRONG COLOUR! BARRIER CLASHED.", "system");
                 setCameraShake(true);

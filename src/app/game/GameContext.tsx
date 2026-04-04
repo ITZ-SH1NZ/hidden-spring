@@ -34,6 +34,13 @@ interface GameState {
   defeatedEnemies: string[];
   checkedEggs: string[];
 
+  isPaused: boolean;
+  setIsPaused: (p: boolean) => void;
+  speedrunStart: number | null;
+  setSpeedrunStart: (t: number) => void;
+  completionTime: number | null;
+  setCompletionTime: (t: number) => void;
+
   devBossPhase: number;
   setDevBossPhase: (phase: number) => void;
 
@@ -74,6 +81,12 @@ const defaultState: GameState = {
   
   defeatedEnemies: [],
   checkedEggs: [],
+  isPaused: false,
+  setIsPaused: () => {},
+  speedrunStart: null,
+  setSpeedrunStart: () => {},
+  completionTime: null,
+  setCompletionTime: () => {},
   devBossPhase: 1,
   setDevBossPhase: () => {},
 
@@ -116,6 +129,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [gameClues, setGameClues] = useState<string[]>([]);
   const [correctEggId, setCorrectEggId] = useState<string | null>(null);
   const [devBossPhase, setDevBossPhase] = useState(1);
+  const [isPaused, setIsPaused] = useState(false);
+  const [speedrunStart, setSpeedrunStart] = useState<number | null>(null);
+  const [completionTime, setCompletionTime] = useState<number | null>(null);
 
   // Load from LocalStorage on mount
   const [isHydrated, setIsHydrated] = useState(false);
@@ -171,6 +187,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    if (isPaused) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
     const speed = scene === "battle" ? 2500 : 1000; // Slower in battle
 
     timerRef.current = setInterval(() => {
@@ -187,7 +208,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [scene]);
+  }, [scene, isPaused]);
 
   useEffect(() => {
     if (lives <= 0) {
@@ -248,7 +269,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <GameContext.Provider value={{
       scene, playerPos, playerHp, playerMaxHp: 100, eggs, lives, timeRemaining, ultimateCharge, gameClues, decryptedClueCount, correctEggId, dialogInfo, currentEnemy,
-      defeatedEnemies, checkedEggs, devBossPhase, setDevBossPhase,
+      defeatedEnemies, checkedEggs,
+      isPaused, setIsPaused, speedrunStart, setSpeedrunStart, completionTime, setCompletionTime,
+      devBossPhase, setDevBossPhase,
       setScene, setPlayerPos, takeDamage, heal, loseLife, setLives, markEnemyDefeated, markEggChecked, collectEgg, addCharge, resetCharge, setTimeRemaining, setGameClues, setCorrectEggId, startBattle, endBattle, showDialog, hideDialog
     }}>
       {children}

@@ -46,7 +46,7 @@ const CarrotSVG = () => (
   </svg>
 );
 
-export default function HeroSection() {
+export default function HeroSection({ onPlay }: { onPlay?: () => void }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const [pageReady, setPageReady] = useState(false);
   const router = useRouter();
@@ -173,7 +173,7 @@ export default function HeroSection() {
         </p>
 
         <div className="flex gap-4">
-          <MagneticButton onClick={() => router.push('/game')} color="black" className="text-[clamp(1rem,1.5vw,2rem)] px-8 py-4 !border-[3px] !border-white">Start The Hunt</MagneticButton>
+          <MagneticButton onClick={() => onPlay ? onPlay() : router.push('/game')} color="black" className="text-[clamp(1rem,1.5vw,2rem)] px-8 py-4 !border-[3px] !border-white">Start The Hunt</MagneticButton>
         </div>
       </motion.div>
     </section>

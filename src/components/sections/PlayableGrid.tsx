@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { playSound } from "@/utils/sound";
 
 // ── CSS Sprites ───────────────────────────────────────────────────────────────
 
@@ -163,6 +164,7 @@ export default function PlayableGrid() {
     if (phase !== "PLAYING") return;
     const hit = guards.some(g => g.row === player.row && g.col === player.col);
     if (!hit) return;
+    playSound("hit");
     setPlayer(PLAYER_START);
     flashMsg("CAUGHT BY A GREY GUARDIAN!");
     setLives(prev => {
@@ -178,6 +180,7 @@ export default function PlayableGrid() {
       const nr = prev.row + dr;
       const nc = prev.col + dc;
       if (!floors[nr]?.[nc]) return prev;
+      playSound("move");
       return { row: nr, col: nc };
     });
   }, [phase]);
@@ -192,9 +195,11 @@ export default function PlayableGrid() {
         if (dist > 1) return egg;
         acted = true;
         if (egg.isSpring) {
+          playSound("crack_good");
           setPhase("WIN");
           flashMsg("SPRING EGG FOUND!");
         } else {
+          playSound("crack_bad");
           flashMsg("HOLLOW EGG! -1 LIFE");
           setLives(l => {
             const next = l - 1;

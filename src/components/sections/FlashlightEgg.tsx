@@ -22,7 +22,7 @@ const MiniFlowerSVG = () => (
 
 const ICONS = [MiniEggSVG, MiniStarSVG, MiniFlowerSVG, MiniStarSVG];
 
-export default function FlashlightEgg() {
+export default function FlashlightEgg({ onPlay }: { onPlay?: () => void }) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -145,7 +145,7 @@ export default function FlashlightEgg() {
           </p>
           
           <div className="relative pointer-events-auto">
-             <MagneticButton color="yellow" onClick={() => router.push('/game')} className="text-[clamp(1.5rem,3vw,3.5rem)] px-14 py-8 font-black tracking-widest !border-white">
+             <MagneticButton color="yellow" onClick={() => onPlay ? onPlay() : router.push('/game')} className="text-[clamp(1.5rem,3vw,3.5rem)] px-14 py-8 font-black tracking-widest !border-white">
                Start Digging
              </MagneticButton>
           </div>

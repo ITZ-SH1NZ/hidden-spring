@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useGame } from "../../app/game/GameContext";
+import { playSound } from "@/utils/sound";
 
 // 0=Floor, 1=Wall, 7=Bush(Hide), 8=Terminal(Objective), 9=Exit(Door)
 const LEVEL2_MAP = [
@@ -37,7 +38,7 @@ interface Drone {
 }
 
 export default function Level2Stealth() {
-  const { playerPos, setPlayerPos, setScene, showDialog, loseLife, lives, setLives, setTimeRemaining, dialogInfo } = useGame();
+  const { playerPos, setPlayerPos, setScene, showDialog, loseLife, setLives, setTimeRemaining, dialogInfo } = useGame();
   
   const dialogOpenRef = useRef(false);
   useEffect(() => { dialogOpenRef.current = dialogInfo.show; }, [dialogInfo.show]);
@@ -141,6 +142,7 @@ export default function Level2Stealth() {
         if (detected && !isHitRef.current) {
            isHitRef.current = true;
            // Boom, caught
+           playSound("stealth_caught");
            loseLife();
            showDialog("SPOTTED BY A PATROL HARE! SCATTER!");
            // Reset player to safe start
@@ -175,10 +177,12 @@ export default function Level2Stealth() {
         const tile = LEVEL2_MAP[y][x];
         // Cannot walk through walls (1), computers (8), or closed doors (9)
         if (tile !== 1 && tile !== 8 && !(tile === 9 && !doorOpen)) {
+           playSound("move");
            setPlayerPos({ x, y, dir });
-           
+
            // If they walked into the open door (exit)
            if (tile === 9 && doorOpen) {
+              playSound("level_complete");
               showDialog("WARREN 2 ESCAPED. FALLING DEEPER...", "system");
               setTimeout(() => {
                  setLives(1);
@@ -209,8 +213,9 @@ export default function Level2Stealth() {
        const term = terminals.find(t => t.x === targetX && t.y === targetY);
        if (term && !activeTerminals.includes(term.id)) {
           const nextLength = activeTerminals.length + 1;
+          playSound("collect");
           setActiveTerminals(prev => [...prev, term.id]);
-          
+
           showDialog(`COLOUR NODE [${nextLength}/5] RESTORED!`);
 
           if (nextLength === 5) {
