@@ -1,26 +1,101 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: 'Bubble Garden';
+  src: url('/fonts/Bubble-Garden-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bubble Garden';
+  src: url('/fonts/Bubble-Garden-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
 }
 
 @theme inline {
+  --color-easter-pink: #FFB6C1;
+  --color-easter-hotpink: #FF69B4;
+  --color-easter-hotpink-dark: #D14798;
+  --color-easter-lightpink: #FFE4E1;
+  --color-easter-blue: #AEE2FF;
+  --color-easter-yellow: #FFF9D2;
+  --color-easter-green: #B5F1B5;
+  --color-easter-purple: #E6D5FF;
+  --color-gray-900: #1A1A1A;
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Bubble Garden', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #FFFEF9; /* ultra light cream */
+  --foreground: #1A1A1A;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Premium touch: subtle radial gradient background */
+  background-image: radial-gradient(circle at 15% 50%, rgba(255, 182, 193, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 30%, rgba(174, 226, 255, 0.15) 0%, transparent 50%);
+  background-attachment: fixed;
+  cursor: none; /* Custom cursor everywhere */
+}
+
+a, button {
+  cursor: none;
+}
+
+::selection {
+  background: var(--color-easter-hotpink);
+  color: white;
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Base custom utility classes */
+.text-outline {
+  -webkit-text-stroke: 2px #1A1A1A;
+  text-shadow: 4px 4px 0px #1A1A1A;
+}
+.text-outline-sm {
+  -webkit-text-stroke: 1.5px #1A1A1A;
+  text-shadow: 2px 2px 0px #1A1A1A;
+}
+
+.brutal-border {
+  border: 4px solid #1A1A1A;
+}
+.brutal-shadow {
+  box-shadow: 6px 6px 0px 0px #1A1A1A;
+}
+.brutal-card {
+  border: 4px solid #1A1A1A;
+  box-shadow: 8px 8px 0px 0px #1A1A1A;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.brutal-card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0px 0px #1A1A1A;
 }
