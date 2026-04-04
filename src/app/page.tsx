@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -34,6 +35,7 @@ if (typeof window !== "undefined") {
 
 export default function Home() {
   const mainRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const runIntro = () => {
@@ -73,7 +75,7 @@ export default function Home() {
           <a href="#play" onClick={(e) => handleScroll(e, '#play')} className="hover:opacity-50 transition-opacity">Play</a>
         </div>
         <div className="nav-item pointer-events-auto">
-          <MagneticButton color="black" className="px-6 py-2 text-sm !border-2 !border-white/50 hover:!border-white transition-colors bg-black/80 backdrop-blur-md">Play Now</MagneticButton>
+          <MagneticButton onClick={() => router.push('/game')} color="black" className="px-6 py-2 text-sm !border-2 !border-white/50 hover:!border-white transition-colors bg-black/80 backdrop-blur-md">Play Now</MagneticButton>
         </div>
       </nav>
 
@@ -160,7 +162,7 @@ export default function Home() {
           <h2 className="text-[clamp(4rem,10vw,10rem)] font-black text-gray-900 leading-[0.9] mb-12 tracking-tighter text-outline-sm drop-shadow-[0_8px_0_#FF69B4]">
             HATCH IT.
           </h2>
-          <MagneticButton color="pink" className="text-[clamp(1.5rem,3vw,3rem)] px-16 py-8 shadow-[8px_8px_0_0_#1A1A1A]">
+          <MagneticButton onClick={() => router.push('/game')} color="pink" className="text-[clamp(1.5rem,3vw,3rem)] px-16 py-8 shadow-[8px_8px_0_0_#1A1A1A]">
             Play Beta
           </MagneticButton>
         </div>

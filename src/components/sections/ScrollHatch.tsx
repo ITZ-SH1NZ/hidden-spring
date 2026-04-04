@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import MagneticButton from "@/components/ui/MagneticButton";
 
 export default function ScrollHatch() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -10,6 +12,7 @@ export default function ScrollHatch() {
   const bottomShellRef = useRef<HTMLDivElement>(null);
   const crackRef = useRef<SVGPathElement>(null);
   const raysRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -93,8 +96,13 @@ export default function ScrollHatch() {
                 <h2 className="text-[clamp(3.5rem,8vw,6.5rem)] font-black leading-none mb-6 tracking-tighter text-easter-hotpink" style={{ WebkitTextStroke: "2px #1A1A1A", textShadow: "4px 4px 0 #1A1A1A" }}>
                   THE MYSTERY<br/>UNFOLDS
                 </h2>
-                <div className="text-[clamp(1.25rem,2vw,1.6rem)] font-bold max-w-xl mx-auto text-gray-800 bg-white p-8 rounded-[40px] border-[4px] border-black brutal-shadow">
+                 <div className="text-[clamp(1.25rem,2vw,1.6rem)] font-bold max-w-xl mx-auto text-gray-800 bg-white p-8 rounded-[40px] border-[4px] border-black brutal-shadow mb-8">
                   A perfect blend of high-end design joy and meticulous gamified exploration.
+                </div>
+                <div className="pointer-events-auto flex justify-center">
+                  <MagneticButton onClick={() => router.push('/game')} color="pink" className="text-xl">
+                    Enter The Spring
+                  </MagneticButton>
                 </div>
              </div>
           </div>

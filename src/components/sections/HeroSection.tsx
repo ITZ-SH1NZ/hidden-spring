@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import MagneticButton from "@/components/ui/MagneticButton";
 
@@ -48,6 +49,7 @@ const CarrotSVG = () => (
 export default function HeroSection() {
   const heroRef = useRef<HTMLDivElement>(null);
   const [pageReady, setPageReady] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const onLoaded = () => setPageReady(true);
@@ -171,7 +173,7 @@ export default function HeroSection() {
         </p>
 
         <div className="flex gap-4">
-          <MagneticButton color="black" className="text-[clamp(1rem,1.5vw,2rem)] px-8 py-4 !border-[3px] !border-white">Start The Hunt</MagneticButton>
+          <MagneticButton onClick={() => router.push('/game')} color="black" className="text-[clamp(1rem,1.5vw,2rem)] px-8 py-4 !border-[3px] !border-white">Start The Hunt</MagneticButton>
         </div>
       </motion.div>
     </section>
