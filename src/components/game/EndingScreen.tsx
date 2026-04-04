@@ -32,7 +32,7 @@ export default function EndingScreen() {
            transition={{ delay: 2, duration: 1 }}
         >
           <h1 className="text-4xl md:text-6xl font-black text-white tracking-widest uppercase mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.8)]">
-            System <span className="text-easter-green">Compromised</span>
+            Spring <span className="text-easter-green">Has Come</span>
           </h1>
           <h2 className="text-xl md:text-2xl text-easter-purple font-bold tracking-[0.5em] mb-12">
             THE EASTER BUG HAS WON.
@@ -47,21 +47,21 @@ export default function EndingScreen() {
          >
            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-easter-purple mt-[-4px] mr-[-4px]" />
            <div className="text-white/50 text-xs tracking-[0.2em] mb-4 text-center">SYSTEM REPORT</div>
-           <h2 className="text-xl md:text-2xl text-easter-green font-black tracking-widest uppercase mb-2 text-center">5/5 Sectors Breached</h2>
-           
+           <h2 className="text-xl md:text-2xl text-easter-green font-black tracking-widest uppercase mb-2 text-center">5/5 Warrens Cleared</h2>
+
            <div className="flex justify-between border-b border-white/10 pb-2 mt-6">
-             <span className="text-white/50">ARCHITECT MAINFRAME:</span>
-             <span className="text-red-500 font-black">OFFLINE</span>
+             <span className="text-white/50">THE GREY KING&apos;S HOLD:</span>
+             <span className="text-red-500 font-black">BROKEN</span>
            </div>
-           
+
            <div className="flex justify-between border-b border-white/10 pb-2">
              <span className="text-white/50">LIVES RETAINED:</span>
              <span className="text-easter-green font-black">{lives} / 3</span>
            </div>
-           
+
            <div className="flex justify-between">
-             <span className="text-white/50">PAYLOAD STATUS:</span>
-             <span className="text-easter-hotpink font-black animate-pulse">SPRING HATCHED</span>
+             <span className="text-white/50">SPRING STATUS:</span>
+             <span className="text-easter-hotpink font-black animate-pulse">FULLY HATCHED</span>
            </div>
          </motion.div>
 
@@ -72,7 +72,7 @@ export default function EndingScreen() {
            className="mt-16"
         >
            <p className="text-xs text-white/50 mb-6 tracking-widest max-w-md mx-auto leading-relaxed">
-             The simulated reality folds inward. The monochromatic constraints dissolve into vibrant chaotic color. You have freed the sequence.
+             The fortress crumbles. Grey gives way to pink, green, gold. Every egg cracks open at once. Spring floods the world — and it&apos;s all because of you.
            </p>
 
            <button 

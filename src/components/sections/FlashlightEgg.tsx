@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import { motion, useSpring, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import MagneticButton from "@/components/ui/MagneticButton";
 
 const MiniEggSVG = () => (
@@ -22,6 +23,7 @@ const MiniFlowerSVG = () => (
 const ICONS = [MiniEggSVG, MiniStarSVG, MiniFlowerSVG, MiniStarSVG];
 
 export default function FlashlightEgg() {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [meadowItems, setMeadowItems] = useState<{ id: number, x: number, y: number, scale: number, rotation: number, type: number, color: string }[]>([]);
@@ -143,7 +145,7 @@ export default function FlashlightEgg() {
           </p>
           
           <div className="relative pointer-events-auto">
-             <MagneticButton color="yellow" className="text-[clamp(1.5rem,3vw,3.5rem)] px-14 py-8 font-black tracking-widest !border-white">
+             <MagneticButton color="yellow" onClick={() => router.push('/game')} className="text-[clamp(1.5rem,3vw,3.5rem)] px-14 py-8 font-black tracking-widest !border-white">
                Start Digging
              </MagneticButton>
           </div>

@@ -99,3 +99,28 @@ a, button {
   transform: translate(-4px, -4px);
   box-shadow: 12px 12px 0px 0px #1A1A1A;
 }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #1A1A1A;
+  border-left: 2px solid #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #FF69B4;
+  border: 2px solid #000;
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D14798;
+}
+::-webkit-scrollbar-corner {
+  background: #1A1A1A;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #FF69B4 #1A1A1A;
+}

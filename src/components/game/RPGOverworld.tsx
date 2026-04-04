@@ -85,14 +85,13 @@ export default function RPGOverworld() {
     // Generate Clues ONLY on fresh run
     if (gameClues.length === 0 && correctEgg) {
        const clues = [];
-       if (correctEgg.y < MAP_HEIGHT / 2) clues.push("The Golden Core is in the NORTHERN sector.");
-       else clues.push("The Golden Core is in the SOUTHERN sector.");
-       
-       if (correctEgg.x < MAP_WIDTH / 2) clues.push("The Sequence lies on the WEST side.");
-       else clues.push("The Sequence lies on the EAST side.");
+       if (correctEgg.y < MAP_HEIGHT / 2) clues.push("The Spring Egg is hidden in the NORTHERN part of the garden.");
+       else clues.push("The Spring Egg is hidden in the SOUTHERN part of the garden.");
 
-       // Add generic clue
-       clues.push("Decryption reveals it sits alone, unguarded at the very end.");
+       if (correctEgg.x < MAP_WIDTH / 2) clues.push("It rests on the WEST side of the garden.");
+       else clues.push("It rests on the EAST side of the garden.");
+
+       clues.push("Scouts report it sits alone, away from the guardians.");
 
        setGameClues(clues);
     }
@@ -128,9 +127,9 @@ export default function RPGOverworld() {
           if (enemyIdx !== -1) {
             const type = activeEnemies[enemyIdx].type;
             let enemyMeta = { name: "Drone", hp: 30, color: "#FF0044", mechanic: "normal" };
-            if (type === 3) enemyMeta = { name: "The Sentinel", hp: 60, color: "#FFAA00", mechanic: "tank" };
-            if (type === 4) enemyMeta = { name: "The Glitch", hp: 30, color: "#00FFCC", mechanic: "evade" };
-            if (type === 5) enemyMeta = { name: "The Firewall", hp: 40, color: "#FF00AA", mechanic: "drain" };
+            if (type === 3) enemyMeta = { name: "The Hollow Hare", hp: 60, color: "#AAAAAA", mechanic: "tank" };
+            if (type === 4) enemyMeta = { name: "The Rot", hp: 30, color: "#7FBF3F", mechanic: "evade" };
+            if (type === 5) enemyMeta = { name: "The Frost Shell", hp: 40, color: "#88CCFF", mechanic: "drain" };
 
             startBattle({
               id: activeEnemies[enemyIdx].id,
@@ -178,7 +177,7 @@ export default function RPGOverworld() {
       const egg = activeEggs[foundEggIndex];
       // Interact with egg
       if (egg.isCorrect) {
-        showDialog("CORRECT SEQUENCE TRACED. SYSTEM OVERRIDDEN.");
+        showDialog("SPRING EGG FOUND! THE WARREN CRACKS OPEN.");
         setTimeout(() => setScene("level_complete"), 2000);
       } else {
         loseLife();
@@ -230,24 +229,49 @@ export default function RPGOverworld() {
         ))}
 
         {/* Draw Enemies */}
-        {activeEnemies.map(en => {
-          let color = "#FF0044";
-          if (en.type === 3) color = "#FFAA00";
-          if (en.type === 4) color = "#00FFCC";
-          if (en.type === 5) color = "#FF00AA";
-          return (
-            <div 
-              key={en.id}
-              className="absolute z-10 flex items-center justify-center pointer-events-none"
-              style={{ width: TILE_SIZE, height: TILE_SIZE, left: en.x * TILE_SIZE, top: en.y * TILE_SIZE }}
-            >
-              <div 
-                className="w-10 h-10 rotate-45 brutal-border animate-pulse"
-                style={{ backgroundColor: color, boxShadow: `0 0 15px ${color}` }}
-              />
-            </div>
-          );
-        })}
+        {activeEnemies.map(en => (
+          <div
+            key={en.id}
+            className="absolute z-10 flex items-center justify-center pointer-events-none"
+            style={{ width: TILE_SIZE, height: TILE_SIZE, left: en.x * TILE_SIZE, top: en.y * TILE_SIZE }}
+          >
+            {/* The Hollow Hare — grey bunny, hollow eyes */}
+            {en.type === 3 && (
+              <div className="relative w-10 h-12 animate-pulse" style={{ filter: "drop-shadow(0 0 8px #AAAAAA)" }}>
+                <div className="absolute top-0 left-[3px] w-[9px] h-[18px] bg-[#666] border border-white/30 rounded-t-full" />
+                <div className="absolute top-0 right-[3px] w-[9px] h-[18px] bg-[#666] border border-white/30 rounded-t-full" />
+                <div className="absolute bottom-0 w-10 h-8 bg-[#888] border border-white/20" />
+                <div className="absolute bottom-3 left-[5px] w-[7px] h-[7px] bg-black border border-white/50" />
+                <div className="absolute bottom-3 right-[5px] w-[7px] h-[7px] bg-black border border-white/50" />
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-5 h-[2px] bg-white/40" />
+              </div>
+            )}
+            {/* The Rot — cracked dark egg, glowing fissure */}
+            {en.type === 4 && (
+              <div className="relative w-9 h-10 animate-pulse" style={{ filter: "drop-shadow(0 0 8px #7FBF3F)" }}>
+                <div className="absolute inset-0 bg-[#1A2A10] border border-[#7FBF3F]/60 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]" />
+                <div className="absolute top-2 left-1/2 w-[2px] h-5 bg-[#7FBF3F] rotate-[10deg] -translate-x-1/2" />
+                <div className="absolute top-4 left-[30%] w-[2px] h-3 bg-[#7FBF3F]/60 rotate-[-20deg]" />
+                <div className="absolute top-2 left-[7px] w-[6px] h-[6px] rounded-full bg-[#7FBF3F]" />
+                <div className="absolute top-2 right-[7px] w-[6px] h-[6px] rounded-full bg-[#7FBF3F]" />
+                <div className="absolute bottom-1 left-1/3 w-[4px] h-2 bg-[#7FBF3F]/50 rounded-b-full" />
+              </div>
+            )}
+            {/* The Frost Shell — spiky icy egg */}
+            {en.type === 5 && (
+              <div className="relative w-10 h-10 flex items-center justify-center animate-pulse" style={{ filter: "drop-shadow(0 0 8px #88CCFF)" }}>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[4px] h-3 bg-[#88CCFF]" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[4px] h-3 bg-[#88CCFF]" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-[4px] bg-[#88CCFF]" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-[4px] bg-[#88CCFF]" />
+                <div className="absolute inset-[10px] rounded-full bg-[#071520] border-2 border-[#88CCFF]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-[6px] h-[6px] rounded-full bg-[#88CCFF]" />
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
 
         {/* Draw Eggs */}
         {activeEggs.map(egg => (

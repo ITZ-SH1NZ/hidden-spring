@@ -25,18 +25,18 @@ export default function GameOverScreen() {
         className="max-w-xl w-full bg-[#050505] brutal-border border-[#FF0044] p-8 md:p-12 text-center relative z-10 shadow-[0_0_50px_rgba(255,0,68,0.5)]"
       >
         <h1 className="text-4xl md:text-6xl font-black text-[#FF0044] tracking-widest mb-4 uppercase mix-blend-screen drop-shadow-[0_0_10px_#FF0044]">
-          SYSTEM PURGE
+          SPRING EXTINGUISHED
         </h1>
         <div className="text-white/60 text-sm md:text-lg mb-10 tracking-widest uppercase">
-          [CRITICAL FAILURE] Avatar Terminated.
+          The Grey King has drained your colour... for now.
         </div>
-        
-        <button 
+
+        <button
           onClick={handleRestart}
           className="w-full py-4 text-xl font-bold brutal-border border-white hover:bg-[#FF0044] hover:text-black hover:border-[#FF0044] transition-all tracking-widest group relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)] -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-          COMPILE NEW ROUTINE
+          HATCH AGAIN
         </button>
       </motion.div>
     </div>

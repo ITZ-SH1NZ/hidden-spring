@@ -98,11 +98,11 @@ export default function Home() {
               <div>
                 <span className="px-4 py-1 border-2 border-black rounded-full font-bold uppercase text-sm mb-6 inline-block">The Vision</span>
                 <h2 className="text-[clamp(2rem,4vw,4rem)] font-black leading-[1.1] mb-6 max-w-2xl">
-                  Not your average egg hunt. We brought pure design joy into gameplay.
+                  Five warrens. One Spring Egg. The Grey King stands in your way.
                 </h2>
               </div>
               <p className="text-[clamp(1rem,1.5vw,1.5rem)] font-bold max-w-lg">
-                Vibrant colors meet mind-bending puzzles in a lush, interactive spring world.
+                A top-down Easter adventure — stealth, combat, platforming, and a final boss fight. All in the browser.
               </p>
             </div>
 
@@ -116,9 +116,9 @@ export default function Home() {
 
             {/* Sub Bentos */}
             {[
-              { color: "bg-easter-blue", icon: <PuzzleSVG className="w-16 h-16" />, title: "Brain Teasers", desc: "Over 50 crafted levels." },
-              { color: "bg-easter-purple", icon: <PaletteSVG className="w-16 h-16" />, title: "Hand-Drawn", desc: "Meticulously crafted sprites." },
-              { color: "bg-easter-green", icon: <AudioSVG className="w-16 h-16" />, title: "Spatial Audio", desc: "Immense soundscapes." }
+              { color: "bg-easter-blue", icon: <PuzzleSVG className="w-16 h-16" />, title: "5 Warrens", desc: "Egg hunt, stealth, free-fall, factory & boss fight." },
+              { color: "bg-easter-purple", icon: <PaletteSVG className="w-16 h-16" />, title: "CSS Sprites", desc: "Every enemy hand-built in code — no image files." },
+              { color: "bg-easter-green", icon: <AudioSVG className="w-16 h-16" />, title: "Boss Fight", desc: "Face the Grey King across 3 brutal phases." }
             ].map((card, idx) => (
               <div key={idx} className={`md:col-span-4 ${card.color} rounded-[40px] p-10 min-h-[300px] flex flex-col justify-end group border-4 border-black brutal-shadow transition-transform hover:-translate-y-2 text-gray-900`}>
                 <div className="mb-auto group-hover:-translate-y-4 group-hover:scale-110 transition-transform duration-300 origin-bottom-left stroke-black stroke-[3px] text-white">

@@ -169,7 +169,7 @@ export default function HeroSection() {
         </div>
 
         <p className="text-[clamp(1rem,2vw,1.5rem)] font-bold text-gray-900 max-w-sm md:max-w-2xl mx-auto mb-10 leading-snug bg-white/90 backdrop-blur-md px-6 py-4 rounded-[30px] border-4 border-black brutal-shadow">
-          A Gamified Exploration wrapped in lush pastel colors.
+          5 Warrens. 3 lives. One Spring Egg hidden among decoys — and Grey Guardians blocking the way.
         </p>
 
         <div className="flex gap-4">

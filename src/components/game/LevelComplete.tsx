@@ -22,23 +22,23 @@ export default function LevelComplete() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-2xl w-full border border-easter-green/30 bg-easter-green/5 p-12 text-center brutal-border relative overflow-hidden shadow-[0_0_40px_rgba(50,205,50,0.1)]"
       >
-        <div className="absolute top-0 right-0 p-2 text-xs text-easter-green/50">SYS.SUCCESS</div>
+        <div className="absolute top-0 right-0 p-2 text-xs text-easter-green/50">SPRING.SUCCESS</div>
 
         <h1 className="text-3xl md:text-5xl font-black text-easter-green tracking-widest mb-6 uppercase drop-shadow-[0_0_10px_#32CD32]">
-          SECTOR 1 CLEARED
+          WARREN 1 ESCAPED
         </h1>
-        
+
         <p className="text-white/70 tracking-wide leading-relaxed mb-10 text-sm md:text-base">
-          The correct Egg Sequence has been validated. <br/><br/>
-          You have breached the outer rim of the Architect's Vault. <br/>
-          WARNING: Combat modules offline. The inner sector relies on stealth detection protocols. Evade the red logic lasers at all costs.
+          The Spring Egg cracked the outer wall. Colour bleeds into the Grey King's fortress. <br/><br/>
+          You've slipped into the underground warrens. Your colour magic is suppressed here — you cannot fight. <br/>
+          Move in silence. Evade the Patrol Hares' Sight-Beams at all costs.
         </p>
 
-        <button 
+        <button
           onClick={handleNextLevel}
           className="px-8 py-4 text-xl font-bold brutal-border border-easter-green text-easter-green hover:bg-easter-green hover:text-black transition-all tracking-widest"
         >
-          INITIATE SECTOR 2
+          ENTER THE HOLLOW WARREN
         </button>
       </motion.div>
     </div>

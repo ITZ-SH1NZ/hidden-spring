@@ -30,9 +30,12 @@ interface GameState {
   
   dialogInfo: { show: boolean; text: string; speaker: "architect" | "system" | "none" };
   currentEnemy: EnemyState | null;
-  
+
   defeatedEnemies: string[];
   checkedEggs: string[];
+
+  devBossPhase: number;
+  setDevBossPhase: (phase: number) => void;
 
   setScene: (scene: SceneType) => void;
   setPlayerPos: (pos: { x: number; y: number; dir: "up" | "down" | "left" | "right" }) => void;
@@ -71,7 +74,9 @@ const defaultState: GameState = {
   
   defeatedEnemies: [],
   checkedEggs: [],
-  
+  devBossPhase: 1,
+  setDevBossPhase: () => {},
+
   setScene: () => {},
   setPlayerPos: () => {},
   takeDamage: () => {},
@@ -110,6 +115,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [checkedEggs, setCheckedEggs] = useState<string[]>([]);
   const [gameClues, setGameClues] = useState<string[]>([]);
   const [correctEggId, setCorrectEggId] = useState<string | null>(null);
+  const [devBossPhase, setDevBossPhase] = useState(1);
 
   // Load from LocalStorage on mount
   const [isHydrated, setIsHydrated] = useState(false);
@@ -160,7 +166,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
-    if (scene === "gameover" || scene === "ending" || scene === "lore" || scene === "lore2" || scene === "lore3" || scene === "level_complete") {
+    if (scene === "gameover" || scene === "ending" || scene === "lore" || scene === "lore2" || scene === "lore3" || scene === "lore4" || scene === "lore5" || scene === "level_complete") {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
@@ -225,7 +231,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setPlayerHp(100); 
       loseLife();
       setPlayerPos({ x: 10, y: 15, dir: "up" }); // Back to start
-      showDialog("AVATAR DESTROYED. RECOMPILING...", "system");
+      showDialog("SHELL CRACKED. REFORMING...", "system");
     }
   };
 
@@ -242,7 +248,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <GameContext.Provider value={{
       scene, playerPos, playerHp, playerMaxHp: 100, eggs, lives, timeRemaining, ultimateCharge, gameClues, decryptedClueCount, correctEggId, dialogInfo, currentEnemy,
-      defeatedEnemies, checkedEggs,
+      defeatedEnemies, checkedEggs, devBossPhase, setDevBossPhase,
       setScene, setPlayerPos, takeDamage, heal, loseLife, setLives, markEnemyDefeated, markEggChecked, collectEgg, addCharge, resetCharge, setTimeRemaining, setGameClues, setCorrectEggId, startBattle, endBattle, showDialog, hideDialog
     }}>
       {children}

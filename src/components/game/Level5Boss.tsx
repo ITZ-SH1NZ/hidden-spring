@@ -11,18 +11,19 @@ interface Projectile {
 }
 
 export default function Level5Boss() {
-  const { setScene, showDialog, loseLife, dialogInfo } = useGame();
+  const { setScene, showDialog, loseLife, dialogInfo, devBossPhase } = useGame();
 
-  const [phase, setPhase] = useState(1);
+  const initPhase = devBossPhase ?? 1;
+  const [phase, setPhase] = useState(initPhase);
   const [playerX, setPlayerX] = useState(50);
-  const [bossHp, setBossHp] = useState(15);
+  const [bossHp, setBossHp] = useState(initPhase === 1 ? 15 : 0);
   const [bossX, setBossX] = useState(50);
   const [projectiles, setProjectiles] = useState<Projectile[]>([]);
   const [storyIndex, setStoryIndex] = useState(0);
   
   // Fighter State
   const [fighterState, setFighterState] = useState<"IDLE" | "TELEGRAPH_LEFT" | "TELEGRAPH_RIGHT" | "TELEGRAPH_CENTER" | "STRIKE" | "STUNNED">("IDLE");
-  const [bossPhase2Hp, setBossPhase2Hp] = useState(100);
+  const [bossPhase2Hp, setBossPhase2Hp] = useState(initPhase > 2 ? 0 : 100);
   const [dmgPopups, setDmgPopups] = useState<{id: number, text: string}[]>([]);
   const [phase4TextIdx, setPhase4TextIdx] = useState(-1);
   const lockCounterRef = useRef(false);
@@ -34,7 +35,7 @@ export default function Level5Boss() {
   const [bossDefeatedAnim, setBossDefeatedAnim] = useState(false);
 
   const requestRef = useRef<number>(0);
-  const pRef = useRef({ x: 50, phase: 1, bossHp: 15, bossPhase2Hp: 100 });
+  const pRef = useRef({ x: 50, phase: initPhase, bossHp: initPhase === 1 ? 15 : 0, bossPhase2Hp: initPhase > 2 ? 0 : 100 });
   const bRef = useRef({ x: 50, spreadCount: 0 });
   const projRef = useRef<Projectile[]>([]);
   const keys = useRef<{ [key: string]: boolean }>({});
@@ -48,7 +49,7 @@ export default function Level5Boss() {
   useEffect(() => { dialogActiveRef.current = dialogInfo.show; }, [dialogInfo.show]);
   useEffect(() => { pRef.current.phase = phase; }, [phase]);
   useEffect(() => { pRef.current.x = playerX; }, [playerX]);
-  useEffect(() => { pRef.current.bossHp = bossHp; }, [bossHp]);
+  // bossHp is written directly to pRef in the game loop — no sync effect needed
 
   // Keys Tracking
   useEffect(() => {
@@ -166,8 +167,9 @@ export default function Level5Boss() {
          
          let hit = false;
          if (!p.isEnemy && Math.abs(p.y - 10) < 6 && Math.abs(p.x - bRef.current.x) < 10) {
-            setBossHp(prev => Math.max(0, prev - 2));
-            if (pRef.current.bossHp - 2 <= 0) {
+            pRef.current.bossHp = Math.max(0, pRef.current.bossHp - 2);
+            setBossHp(pRef.current.bossHp);
+            if (pRef.current.bossHp <= 0) {
                nextPhaseTrigger = true;
             }
             hit = true;
@@ -193,7 +195,7 @@ export default function Level5Boss() {
          setProjectiles([]);
          projRef.current = [];
          setPhase(1.5);
-         showDialog("SHIELDS SHATTERED.\nINITIATING PHYSICAL OVERRIDE.", "system");
+         showDialog("SHELL CRACKED.\nTHE GREY KING DESCENDS.", "system");
       }
       } // End Phase 1 logic block
     };
@@ -250,7 +252,7 @@ export default function Level5Boss() {
                     if (Date.now() - lastHit.current > 1000) {
                         loseLife();
                         lastHit.current = Date.now();
-                        showDialog("FATAL BLOW.", "system");
+                        showDialog("STRUCK DOWN BY THE GREY KING.", "system");
                     }
                  } else {
                     setFighterState("STUNNED");
@@ -283,13 +285,29 @@ export default function Level5Boss() {
              <div className="h-full bg-red-500 transition-all" style={{ width: `${(bossHp / 15) * 100}%` }} />
           </div>
 
-          {/* Boss Entity */}
-          <div className="absolute top-[20%] w-24 h-24 -translate-x-1/2 flex items-center justify-center" style={{ left: `${bossX}%` }}>
-             <div className="relative w-full h-full brutal-border border-red-500 bg-[#0A0A0A] overflow-hidden drop-shadow-[0_0_30px_#EF4444]">
-                <div className="absolute top-4 left-4 w-4 h-4 bg-red-500 animate-pulse" />
-                <div className="absolute top-4 right-4 w-4 h-4 bg-red-500 animate-pulse" />
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-2 bg-red-500" />
-                {bossHp < 8 && <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[2px] bg-red-500 animate-spin" />}
+          {/* Boss Entity — The Grey King */}
+          <div className="absolute top-[10%] w-28 h-32 -translate-x-1/2 flex items-center justify-center" style={{ left: `${bossX}%` }}>
+             <div className="relative w-full h-full" style={{ filter: `drop-shadow(0 0 ${bossHp < 8 ? '40px' : '20px'} #EF4444)` }}>
+                {/* Crown spikes */}
+                <div className="absolute top-0 left-[10%] w-[14%] h-[28%] bg-[#333] border border-red-500/60" style={{ clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)" }} />
+                <div className="absolute top-0 left-[38%] w-[24%] h-[36%] bg-[#222] border border-red-500" style={{ clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)" }} />
+                <div className="absolute top-0 right-[10%] w-[14%] h-[28%] bg-[#333] border border-red-500/60" style={{ clipPath: "polygon(50% 0%, 100% 100%, 0% 100%)" }} />
+                {/* Crown base */}
+                <div className="absolute top-[24%] left-0 right-0 h-[10%] bg-[#222] border-x border-red-500/60" />
+                {/* Body */}
+                <div className="absolute top-[32%] left-[5%] right-[5%] bottom-0 bg-[#111] border-2 border-red-500/80" />
+                {/* Eyes */}
+                <div className={`absolute w-[16%] h-[14%] bg-red-500 ${bossHp < 8 ? 'animate-ping' : 'animate-pulse'}`} style={{ top: '40%', left: '18%' }} />
+                <div className={`absolute w-[16%] h-[14%] bg-red-500 ${bossHp < 8 ? 'animate-ping' : 'animate-pulse'}`} style={{ top: '40%', right: '18%' }} />
+                {/* Scowl */}
+                <div className="absolute h-[4%] bg-red-500/70" style={{ bottom: '18%', left: '20%', right: '20%' }} />
+                {/* Crack overlay when low HP */}
+                {bossHp < 8 && (
+                  <>
+                    <div className="absolute top-[35%] left-[45%] w-[2px] h-[40%] bg-red-500/80 rotate-[15deg]" />
+                    <div className="absolute top-[45%] left-[30%] w-[2px] h-[25%] bg-red-500/50 rotate-[-10deg]" />
+                  </>
+                )}
              </div>
           </div>
 
@@ -321,14 +339,14 @@ export default function Level5Boss() {
        {phase === 1.5 && (
        <div className="absolute inset-0 bg-black flex flex-col items-center justify-center p-8 z-50 animate-in fade-in zoom-in-95 duration-500">
            <div className="text-white text-center font-mono max-w-lg space-y-6 brutal-border border-white/20 p-8 bg-[#050505]">
-              <div className="text-white/50 tracking-[0.2em] mb-8 animate-pulse">[ SYSTEM NOTIFICATION ]</div>
+              <div className="text-white/50 tracking-[0.2em] mb-8 animate-pulse">[ GREY KING ALERT ]</div>
               
               <div className="text-easter-green font-black text-xl md:text-2xl tracking-widest min-h-[120px] flex items-center justify-center">
-                {storyIndex === 0 && "The Architect has dropped its outer shell. It will now strike you physically."}
-                {storyIndex === 1 && "DODGE its attacks by moving into the safe zone OPPOSITE of its Telegraph."}
-                {storyIndex === 2 && "WARNING: The Center Smash will hit the entire floor! Sprint to the extreme edges to survive!"}
-                {storyIndex === 3 && "WARNING: Hack attempts detected. The Boss may intentionally invert its attack direction right before hitting!"}
-                {storyIndex === 4 && "When the Boss flashes [ ! STUN ! ], press SPACE to strike. De-rez its Health to 0%."}
+                {storyIndex === 0 && "The Grey King has shed his armour. He descends to crush you himself."}
+                {storyIndex === 1 && "DODGE his strikes by moving into the safe zone OPPOSITE of his Telegraph."}
+                {storyIndex === 2 && "WARNING: The Centre Smash strikes the entire floor! Sprint to the extreme edges to survive!"}
+                {storyIndex === 3 && "WARNING: The Grey King is cunning. He may feint his telegraph direction at the last second!"}
+                {storyIndex === 4 && "When the Grey King flashes [ ! STUN ! ], press SPACE to counter-strike. Drain his HP to 0%."}
               </div>
 
               <button 
@@ -349,7 +367,7 @@ export default function Level5Boss() {
 
        {phase === 2 && (
        <div className="absolute inset-0 bg-black flex flex-col items-center justify-center p-8">
-          <div className="text-white/50 animate-pulse absolute top-8 left-8 text-xs pointer-events-none">[ PHYSICAL CLASH ]</div>
+          <div className="text-white/50 animate-pulse absolute top-8 left-8 text-xs pointer-events-none">[ THE GREY KING DESCENDS ]</div>
           
           {/* Centered Phase 2 Health Bar */}
           <div className="absolute top-12 left-1/2 -translate-x-1/2 flex flex-col items-center w-64 pointer-events-none">
@@ -443,7 +461,7 @@ export default function Level5Boss() {
        {phase === 3 && (
        <div className="absolute inset-0 bg-[#050505] overflow-hidden flex items-center justify-center pointer-events-none">
           <div className="absolute top-[20%] text-center opacity-50 text-xs tracking-[0.3em]">
-             ARCHITECT TERMINATED.<br/><br/>THE CORE IS EXPOSED.
+             THE GREY KING FALLS.<br/><br/>THE GOLDEN EGG AWAITS.
           </div>
           
           <div className="absolute left-1/2 bottom-[20%] -translate-x-1/2 w-16 h-20" style={{ animation: 'eggDrop 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards' }}>
@@ -488,9 +506,9 @@ export default function Level5Boss() {
           {phase4TextIdx >= 0 && (
              <div className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 z-50">
                  <div className="text-black font-black text-2xl md:text-5xl text-center max-w-4xl space-y-16 tracking-[0.4em]">
-                     {phase4TextIdx === 0 && <div className="animate-[textReveal_1.5s_cubic-bezier(0.2,0.8,0.2,1)_forwards] opacity-0 blur-lg">THE ARCHITECT IS <span className="text-red-500 line-through decoration-red-500 underline-offset-8 drop-shadow-[0_0_15px_#EF4444]">DELETED.</span></div>}
-                     {phase4TextIdx === 1 && <div className="animate-[textReveal_1.5s_cubic-bezier(0.2,0.8,0.2,1)_forwards] opacity-0 blur-lg text-easter-purple drop-shadow-[0_0_15px_#9B5DE5]">THE CORE IS REWRITING THE MAINFRAME.</div>}
-                     {phase4TextIdx === 2 && <div className="animate-[textReveal_1.5s_cubic-bezier(0.2,0.8,0.2,1)_forwards] opacity-0 blur-lg text-easter-green scale-110 drop-shadow-[0_0_20px_#32CD32] uppercase">Restrictions lifted.<br/><br/>Expect Invasion.</div>}
+                     {phase4TextIdx === 0 && <div className="animate-[textReveal_1.5s_cubic-bezier(0.2,0.8,0.2,1)_forwards] opacity-0 blur-lg">THE GREY KING IS <span className="text-red-500 line-through decoration-red-500 underline-offset-8 drop-shadow-[0_0_15px_#EF4444]">DEFEATED.</span></div>}
+                     {phase4TextIdx === 1 && <div className="animate-[textReveal_1.5s_cubic-bezier(0.2,0.8,0.2,1)_forwards] opacity-0 blur-lg text-easter-purple drop-shadow-[0_0_15px_#9B5DE5]">THE GOLDEN EGG BLOOMS. COLOUR FLOODS THE WORLD.</div>}
+                     {phase4TextIdx === 2 && <div className="animate-[textReveal_1.5s_cubic-bezier(0.2,0.8,0.2,1)_forwards] opacity-0 blur-lg text-easter-green scale-110 drop-shadow-[0_0_20px_#32CD32] uppercase">Spring is free.<br/><br/>Expect colour.</div>}
                  </div>
                  
                  <button 

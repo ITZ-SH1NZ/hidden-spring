@@ -142,7 +142,7 @@ export default function Level3Runner() {
                    isSpawningNode.current = false;
                    
                    setFlash(true);
-                   setBreachText(`FIREWALL ${phaseRef.current - 1} SHATTERED`);
+                   setBreachText(`GREY BARRIER ${phaseRef.current - 1} SHATTERED`);
                    setCameraShake(true);
                    
                    // Delete all other objects
@@ -168,7 +168,7 @@ export default function Level3Runner() {
              } else if (!isHitRef.current) {
                 isHitRef.current = true;
                 loseLife();
-                showDialog("[CRITICAL] SHIELD OVERTORN.", "system");
+                showDialog("WRONG COLOUR! BARRIER CLASHED.", "system");
                 setCameraShake(true);
                 setTimeout(() => { 
                    isHitRef.current = false; 
@@ -198,10 +198,26 @@ export default function Level3Runner() {
   // }, []);
 
   return (
-    <div className={`absolute inset-0 bg-[#050505] overflow-hidden font-mono z-0 transition-transform`}>
-       
-       {/* Background Scrolling Matrix effect */}
-       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_2px,transparent_2px)] bg-[size:100%_40px] pointer-events-none" />
+    <div className={`absolute inset-0 overflow-hidden font-mono z-0 transition-transform`} style={{ background: 'linear-gradient(to bottom, #0A1A2E 0%, #0D1810 40%, #050505 100%)' }}>
+
+       {/* Falling petals background */}
+       <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[...Array(14)].map((_, i) => (
+             <div
+               key={i}
+               className="absolute rounded-full opacity-30 animate-bounce"
+               style={{
+                  width: `${4 + (i % 4) * 3}px`,
+                  height: `${4 + (i % 4) * 3}px`,
+                  left: `${(i * 7.2) % 100}%`,
+                  top: `${(i * 13 + 10) % 90}%`,
+                  backgroundColor: ['#FF69B4','#FFD700','#98FB98','#DDA0DD','#87CEEB'][i % 5],
+                  animationDuration: `${2 + (i % 4)}s`,
+                  animationDelay: `${(i * 0.4) % 2}s`,
+               }}
+             />
+          ))}
+       </div>
 
        {/* Phase Flash Overlay */}
        {flash && <div className="absolute inset-0 bg-white z-[200] opacity-50" />}
@@ -217,7 +233,7 @@ export default function Level3Runner() {
 
        {/* HUD Additions */}
        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center pointer-events-none text-white drop-shadow-md">
-          <span className="text-xs opacity-50 uppercase tracking-widest">FIREWALL BREACH STATUS</span>
+          <span className="text-xs opacity-50 uppercase tracking-widest">GREY BARRIER DESCENT</span>
           <div className="flex gap-2 font-black text-2xl tracking-widest mt-1">
              <span className={phase > 1 ? 'text-easter-green shadow-[0_0_10px_#32CD32]' : 'text-white/20'}>01</span> / 
              <span className={phase > 2 ? 'text-easter-green shadow-[0_0_10px_#32CD32]' : 'text-white/20'}>02</span> / 
@@ -239,7 +255,13 @@ export default function Level3Runner() {
                   boxShadow: `0 0 20px ${ob.color === "green" ? "#32CD32" : "#9B5DE5"}`
                }}
              >
-                {ob.isNode && <span className="font-mono text-white/50 text-2xl font-black uppercase tracking-widest">[ FIREWALL NODE ]</span>}
+                {ob.isNode && (
+                   <div className="flex items-center gap-4">
+                      <div className="w-6 h-8 rounded-[50%_50%_50%_50%/60%_60%_40%_40%] border-2 border-white/60 animate-pulse" style={{ backgroundColor: ob.color === "green" ? "rgba(50,205,50,0.6)" : "rgba(155,93,229,0.6)" }} />
+                      <span className="font-mono text-white/70 text-xl font-black uppercase tracking-widest">[ GREY BARRIER ]</span>
+                      <div className="w-6 h-8 rounded-[50%_50%_50%_50%/60%_60%_40%_40%] border-2 border-white/60 animate-pulse" style={{ backgroundColor: ob.color === "green" ? "rgba(50,205,50,0.6)" : "rgba(155,93,229,0.6)" }} />
+                   </div>
+                )}
              </div>
           ))}
        </div>

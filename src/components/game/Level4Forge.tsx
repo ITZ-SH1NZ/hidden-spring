@@ -137,7 +137,7 @@ export default function Level4Forge() {
       // Hit Terminal?
       if (py === 0) {
          dialogActiveRef.current = true;
-         showDialog("[ FORGE OVERLOAD INITIATED ]", "system");
+         showDialog("[ FACTORY OVERRIDE COMPLETE — ESCAPE! ]", "system");
          setTimeout(() => {
             setScene("lore5");
          }, 3000);
@@ -147,7 +147,7 @@ export default function Level4Forge() {
       // Hit Stamper?
       if (py === 5 && stampActive) {
          loseLife();
-         showDialog("[CRITICAL] CRUSHED BY STAMPER.", "system");
+         showDialog("CRUSHED BY THE STAMPER. REFORMING.", "system");
          resetPosition();
          return;
       }
@@ -165,7 +165,7 @@ export default function Level4Forge() {
 
       if (hit) {
          loseLife();
-         showDialog("[CRITICAL] PACKAGED INTO CRATE.", "system");
+         showDialog("PACKAGED INTO A GREY BOX. REFORMING.", "system");
          resetPosition();
       }
     };
@@ -181,24 +181,29 @@ export default function Level4Forge() {
        <div className="relative w-full aspect-square max-w-3xl max-h-full border-4 border-easter-purple/30 bg-[#0A0A0A] overflow-hidden">
           
           {/* Conveyor Backgrounds */}
-          <div className="absolute top-[9.09%] left-0 w-full h-[9.09%] bg-white/5 border-y border-dashed border-white/20 animate-pulse" />
-          <div className="absolute top-[27.27%] left-0 w-full h-[9.09%] bg-white/5 border-y border-dashed border-white/20 animate-pulse" />
-          <div className="absolute top-[45.45%] left-0 w-full h-[9.09%] bg-easter-purple/10 border-y border-easter-purple/30 z-0 flex items-center justify-center">
-             <span className="text-easter-purple/20 text-xs tracking-[1em]">STAMP_ZONE</span>
+          <div className="absolute top-[9.09%] left-0 w-full h-[9.09%] border-y border-dashed border-white/20 animate-pulse" style={{ background: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 18px, transparent 18px, transparent 36px)' }} />
+          <div className="absolute top-[27.27%] left-0 w-full h-[9.09%] border-y border-dashed border-white/20 animate-pulse" style={{ background: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 18px, transparent 18px, transparent 36px)' }} />
+          {/* Stamper zone — colour-drain press */}
+          <div className="absolute top-[45.45%] left-0 w-full h-[9.09%] bg-easter-purple/10 border-y border-easter-purple/40 z-0 flex items-center justify-center gap-4 overflow-hidden">
+             <div className="w-3 h-3 rounded-full bg-easter-purple/30" />
+             <span className="text-easter-purple/40 text-xs tracking-[0.5em] uppercase">COLOUR DRAIN STAMPER</span>
+             <div className="w-3 h-3 rounded-full bg-easter-purple/30" />
           </div>
-          <div className="absolute top-[63.63%] left-0 w-full h-[9.09%] bg-white/5 border-y border-dashed border-white/20 animate-pulse" />
-          <div className="absolute top-[72.72%] left-0 w-full h-[9.09%] bg-white/5 border-y border-dashed border-white/20 animate-pulse" />
+          <div className="absolute top-[63.63%] left-0 w-full h-[9.09%] border-y border-dashed border-white/20 animate-pulse" style={{ background: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 18px, transparent 18px, transparent 36px)' }} />
+          <div className="absolute top-[72.72%] left-0 w-full h-[9.09%] border-y border-dashed border-white/20 animate-pulse" style={{ background: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 18px, transparent 18px, transparent 36px)' }} />
 
-          {/* Terminal at Row 0 */}
-          <div className="absolute top-0 left-0 w-full h-[9.09%] bg-easter-green/20 border-b-2 border-easter-green flex items-center justify-center">
-             <span className="text-easter-green font-black tracking-widest text-sm animate-pulse">OVERRIDE TERMINAL</span>
+          {/* Colour Restore Terminal at Row 0 */}
+          <div className="absolute top-0 left-0 w-full h-[9.09%] bg-easter-green/20 border-b-2 border-easter-green flex items-center justify-center gap-3">
+             <div className="w-3 h-4 rounded-[50%_50%_50%_50%/60%_60%_40%_40%] bg-easter-green/60 border border-easter-green animate-pulse" />
+             <span className="text-easter-green font-black tracking-widest text-sm animate-pulse">COLOUR RESTORE TERMINAL</span>
+             <div className="w-3 h-4 rounded-[50%_50%_50%_50%/60%_60%_40%_40%] bg-easter-green/60 border border-easter-green animate-pulse" />
           </div>
 
-          {/* Rendering Entities (Crates) */}
+          {/* Rendering Entities (grey drained eggs on conveyor) */}
           {entities.map(e => (
-            <div 
+            <div
               key={e.id}
-              className="absolute bg-white/80 border-2 border-black drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] z-10 flex items-center justify-center"
+              className="absolute z-10 flex items-center justify-center gap-[4%]"
               style={{
                  left: `${e.x * 10}%`,
                  top: `${e.y * 9.09}%`,
@@ -206,13 +211,29 @@ export default function Level4Forge() {
                  height: "9.09%"
               }}
             >
-               <span className="text-black text-[8px] font-bold rotate-90 hidden md:block">DATA</span>
+               {Array.from({ length: e.width }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-[70%] border border-white/20 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]"
+                    style={{
+                       width: `${90 / e.width}%`,
+                       backgroundColor: '#2A2A2A',
+                       borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                    }}
+                  />
+               ))}
             </div>
           ))}
 
-          {/* Rendering Stamper overlay */}
+          {/* Stamper press overlay — slams down like a colour-drain press */}
           {stampActive && (
-             <div className="absolute top-[45.45%] left-0 w-full h-[9.09%] bg-easter-purple drop-shadow-[0_0_20px_#9B5DE5] z-40 opacity-80 mix-blend-screen" />
+             <div className="absolute top-[45.45%] left-0 w-full h-[9.09%] z-40 flex items-center justify-center overflow-hidden" style={{ backgroundColor: 'rgba(155,93,229,0.85)', boxShadow: '0 0 30px #9B5DE5, inset 0 -4px 0 rgba(0,0,0,0.4)' }}>
+                <div className="flex items-center gap-3">
+                   <div className="w-4 h-4 rounded-full bg-black/40 border border-white/20" />
+                   <span className="text-white/80 text-[10px] font-black tracking-[0.3em] uppercase">DRAINING COLOUR</span>
+                   <div className="w-4 h-4 rounded-full bg-black/40 border border-white/20" />
+                </div>
+             </div>
           )}
 
           {/* Player */}

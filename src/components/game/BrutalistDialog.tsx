@@ -24,7 +24,7 @@ export default function BrutalistDialog() {
             >
                {dialogInfo.speaker === "architect" && (
                  <div className="font-mono text-easter-hotpink font-bold tracking-widest text-sm mb-4 uppercase">
-                   [ The Architect ]
+                   [ The Grey King ]
                  </div>
                )}
                <h2 

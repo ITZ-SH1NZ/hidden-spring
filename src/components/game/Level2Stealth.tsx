@@ -142,7 +142,7 @@ export default function Level2Stealth() {
            isHitRef.current = true;
            // Boom, caught
            loseLife();
-           showDialog("[CRITICAL ALERT] UNAUTHORIZED ENTITY DETECTED. PURGING.");
+           showDialog("SPOTTED BY A PATROL HARE! SCATTER!");
            // Reset player to safe start
            setPlayerPos({ x: 2, y: 1, dir: "down" });
            
@@ -179,7 +179,7 @@ export default function Level2Stealth() {
            
            // If they walked into the open door (exit)
            if (tile === 9 && doorOpen) {
-              showDialog("SECTOR 2 BREACHED. INITIATING CORE DROP.", "system");
+              showDialog("WARREN 2 ESCAPED. FALLING DEEPER...", "system");
               setTimeout(() => {
                  setLives(1);
                  setTimeRemaining(120);
@@ -211,100 +211,122 @@ export default function Level2Stealth() {
           const nextLength = activeTerminals.length + 1;
           setActiveTerminals(prev => [...prev, term.id]);
           
-          showDialog(`SYSTEM OVERRIDE [${nextLength}/5]`);
-          
+          showDialog(`COLOUR NODE [${nextLength}/5] RESTORED!`);
+
           if (nextLength === 5) {
             setTimeout(() => {
               setDoorOpen(true);
-              showDialog("BLAST DOORS OPEN. PROCEED TO CORE.");
+              showDialog("ALL NODES BLOOMING. BURROW EXIT OPEN!");
             }, 2000);
           }
        } else if (term) {
           // already active
-          showDialog("NODE ALREADY COMPROMISED.");
+          showDialog("THIS NODE IS ALREADY BLOOMING.");
        }
     }
   };
 
 
   return (
-    <div className="absolute inset-0 bg-[#050505] flex items-center justify-center font-mono">
+    <div className="absolute inset-0 flex items-center justify-center font-mono" style={{ backgroundColor: '#0D0A06' }}>
+       {/* Warren earth texture overlay */}
+       <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(101,67,33,0.3) 38px, rgba(101,67,33,0.3) 40px), repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(101,67,33,0.15) 78px, rgba(101,67,33,0.15) 80px)' }} />
+
        <div className="absolute bottom-6 right-6 text-right z-[120]">
           <div className="text-easter-green text-3xl font-black drop-shadow-[0_0_10px_#32CD32]">
              {activeTerminals.length}/5
           </div>
-          <div className="text-white/50 text-sm tracking-widest bg-black/60 px-2 py-1 brutal-border border-white/10 backdrop-blur-sm mt-1">NODES COMPROMISED</div>
+          <div className="text-white/50 text-sm tracking-widest bg-black/60 px-2 py-1 brutal-border border-white/10 backdrop-blur-sm mt-1">COLOUR NODES BLOOMING</div>
        </div>
 
-       <div className="relative border-4 border-easter-purple/30 brutal-shadow p-2 bg-[#0A0A0A]">
+       <div className="relative border-4 border-[#3D2B1F]/60 brutal-shadow p-2" style={{ backgroundColor: '#100C07' }}>
           {/* Map Grid */}
-          <div 
-             className="grid gap-[2px] bg-white/5"
+          <div
+             className="grid gap-[2px]"
              style={{
-               gridTemplateColumns: `repeat(${MAP_WIDTH}, minmax(0, 1fr))`
+               gridTemplateColumns: `repeat(${MAP_WIDTH}, minmax(0, 1fr))`,
+               backgroundColor: 'rgba(101,67,33,0.08)'
              }}
           >
-             {LEVEL2_MAP.map((row, y) => 
+             {LEVEL2_MAP.map((row, y) =>
                row.map((cell, x) => (
                   <div key={`${x}-${y}`} className="w-8 h-8 md:w-[42px] md:h-[42px] relative flex items-center justify-center">
-                     {/* Wall */}
-                     {cell === 1 && <div className="w-full h-full bg-white/20 border border-white/10" />}
-                     
-                     {/* Bush */}
+                     {/* Warren wall — earthy packed dirt */}
+                     {cell === 1 && (
+                        <div className="w-full h-full border border-[#3D2B1F]/60" style={{ backgroundColor: '#2A1F12' }}>
+                           <div className="w-full h-[2px] mt-[30%]" style={{ backgroundColor: 'rgba(101,67,33,0.4)' }} />
+                           <div className="w-full h-[2px] mt-[30%]" style={{ backgroundColor: 'rgba(101,67,33,0.25)' }} />
+                        </div>
+                     )}
+
+                     {/* Bramble Nest — hides player */}
                      {cell === 7 && (
-                        <div className="w-full h-full bg-easter-green/20 border border-easter-green border-dashed overflow-hidden flex items-center justify-center">
-                          <span className="text-easter-green/50 text-[10px] animate-pulse">#_#</span>
+                        <div className="w-full h-full bg-easter-green/15 border border-easter-green/50 border-dashed overflow-hidden flex items-center justify-center relative">
+                           {/* Flower clusters */}
+                           <div className="absolute top-[15%] left-[10%] w-[20%] h-[20%] rounded-full bg-easter-hotpink/60" />
+                           <div className="absolute top-[10%] right-[15%] w-[16%] h-[16%] rounded-full bg-easter-yellow/60" />
+                           <div className="absolute bottom-[10%] left-[25%] w-[18%] h-[18%] rounded-full bg-white/40" />
+                           <span className="text-easter-green/60 text-[9px] z-10">#_#</span>
                         </div>
                      )}
 
-                     {/* Terminal */}
-                     {cell === 8 && (
-                        <div className={`w-full h-full border-2 ${activeTerminals.includes(terminals.find(t => t.x === x && t.y === y)?.id || "") ? 'bg-easter-green border-easter-green' : 'bg-transparent border-easter-hotpink animate-pulse'} flex items-center justify-center`}>
-                           <div className="w-2 h-2 bg-black" />
-                        </div>
-                     )}
+                     {/* Colour Node (terminal) */}
+                     {cell === 8 && (() => {
+                        const activated = activeTerminals.includes(terminals.find(t => t.x === x && t.y === y)?.id || "");
+                        return (
+                           <div className={`w-full h-full border-2 flex items-center justify-center relative overflow-hidden transition-all duration-500 ${activated ? 'border-easter-green bg-easter-green/20' : 'border-easter-hotpink/80 bg-easter-hotpink/5 animate-pulse'}`}>
+                              {/* Egg shape inside node */}
+                              <div className={`w-[40%] h-[55%] rounded-[50%_50%_50%_50%/60%_60%_40%_40%] border ${activated ? 'bg-easter-green border-white/60' : 'bg-easter-hotpink/60 border-white/30'}`} />
+                              {activated && <div className="absolute inset-0 bg-easter-green/10 animate-ping" />}
+                           </div>
+                        );
+                     })()}
 
-                     {/* Door */}
+                     {/* Burrow exit door */}
                      {cell === 9 && (
-                        <div className={`w-full h-full border-2 transition-all duration-1000 ${doorOpen ? 'bg-transparent border-easter-green/30' : 'bg-easter-yellow border-easter-yellow'}`} />
+                        <div className={`w-full h-full border-2 transition-all duration-1000 flex items-center justify-center ${doorOpen ? 'border-easter-green/60 bg-easter-green/10' : 'border-easter-yellow bg-easter-yellow/80'}`}>
+                           {!doorOpen && <div className="w-[30%] h-[40%] rounded-full border border-black/40 bg-black/20" />}
+                           {doorOpen && <div className="w-[30%] h-[40%] rounded-full border border-easter-green/60 animate-ping" />}
+                        </div>
                      )}
                   </div>
                ))
              )}
           </div>
 
-          {/* Drones */}
+          {/* Patrol Hares */}
           {drones.map(d => {
-             const vec = getDirVec(d.dir);
-             const droneRotation = d.dir === 'up' ? -45 : d.dir === 'down' ? 135 : d.dir === 'left' ? -135 : 45;
              return (
                <motion.div
                  key={d.id}
-                 className="absolute top-2 left-2 w-8 h-8 md:w-[42px] md:h-[42px] pointer-events-none flex items-center justify-center"
+                 className="absolute top-2 left-2 w-8 h-8 md:w-[42px] md:h-[42px] pointer-events-none flex items-center justify-center z-20"
                  animate={{
                     x: d.x * (typeof window !== 'undefined' && window.innerWidth >= 768 ? 44 : 34),
                     y: d.y * (typeof window !== 'undefined' && window.innerWidth >= 768 ? 44 : 34)
                  }}
                  transition={{ duration: 0.7, ease: "linear" }}
                >
-                 {/* Sentinel Drone SVG ported from Level 1 */}
-                 <div 
-                   className="w-[80%] h-[80%] brutal-border animate-pulse shadow-[0_0_15px_rgba(255,0,68,0.8)] z-20"
-                   style={{ backgroundColor: "#FF0044", transform: `rotate(${droneRotation}deg)` }}
-                 />
-                 
-                 {/* Laser Vision Projector */}
-                 <div 
-                   className="absolute bg-gradient-to-r from-red-600/60 to-transparent z-10 pointer-events-none"
+                 {/* Patrol Hare sprite */}
+                 <div className="relative w-[85%] h-[85%] flex items-end justify-center" style={{ filter: 'drop-shadow(0 0 6px rgba(255,0,68,0.7))' }}>
+                    {/* Ears */}
+                    <div className="absolute top-0 left-[12%] w-[20%] h-[40%] bg-[#666] border border-red-500/40 rounded-t-full" />
+                    <div className="absolute top-0 right-[12%] w-[20%] h-[40%] bg-[#666] border border-red-500/40 rounded-t-full" />
+                    {/* Body */}
+                    <div className="absolute bottom-0 w-full h-[68%] bg-[#555] border border-red-500/50" />
+                    {/* Eyes — glow red */}
+                    <div className="absolute bottom-[38%] left-[16%] w-[18%] h-[18%] bg-red-500 animate-pulse" />
+                    <div className="absolute bottom-[38%] right-[16%] w-[18%] h-[18%] bg-red-500 animate-pulse" />
+                 </div>
+
+                 {/* Sight-beam projector */}
+                 <div
+                   className="absolute pointer-events-none z-10"
                    style={{
-                      width: '120px', 
-                      height: '4px',
+                      width: '120px',
+                      height: '3px',
+                      background: 'linear-gradient(to right, rgba(255,0,68,0.7), transparent)',
                       transformOrigin: '0 50%',
-                      transform: `
-                        translate(50%, 0)
-                        rotate(${d.dir === 'right' ? 0 : d.dir === 'down' ? 90 : d.dir === 'left' ? 180 : -90}deg)
-                        translateX(10px)
-                      `
+                      transform: `translate(50%, 0) rotate(${d.dir === 'right' ? 0 : d.dir === 'down' ? 90 : d.dir === 'left' ? 180 : -90}deg) translateX(10px)`
                    }}
                  />
                </motion.div>

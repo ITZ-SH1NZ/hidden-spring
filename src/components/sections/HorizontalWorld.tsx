@@ -139,10 +139,10 @@ export default function HorizontalWorld() {
           </div>
           <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
             <h3 className="text-[clamp(3.5rem,7vw,9.5rem)] font-black leading-[0.85] mb-8 relative z-10 text-easter-hotpink drop-shadow-[5px_5px_0_#1A1A1A]">
-              BLOOMING<br/>GARDENS
+              THE<br/>GARDEN
             </h3>
             <p className="text-[clamp(1.1rem,2.2vw,2.8rem)] font-bold max-w-xl leading-tight relative z-10 text-gray-800">
-              Where geometric brutalism meets the untamed beauty of spring flora.
+              Warren 1 — crack open eggs, defeat Grey Guardians, and find the Spring Egg before time runs out.
             </p>
           </motion.div>
         </div>
@@ -153,10 +153,10 @@ export default function HorizontalWorld() {
             <BunnySVG />
           </div>
           <h3 className="text-[clamp(3.5rem,7vw,9.5rem)] font-black leading-[0.85] mb-8 relative z-10 text-easter-blue drop-shadow-[5px_5px_0_#1A1A1A]">
-            BUNNY<br/>HOLLOW
+            THE<br/>WARRENS
           </h3>
           <p className="text-[clamp(1.1rem,2.2vw,2.8rem)] font-bold max-w-xl leading-tight relative z-10 text-gray-800">
-            The beating heart of the mystery. Watch for shifting shadows in the grass.
+            Stealth through patrol hares, survive the free-fall, shut down the factory — five distinct challenges.
           </p>
         </div>
 
@@ -166,10 +166,10 @@ export default function HorizontalWorld() {
             <GemSVG />
           </div>
           <h3 className="text-[clamp(3.5rem,7vw,9.5rem)] font-black leading-[0.85] mb-8 relative z-10 text-white drop-shadow-[5px_5px_0_#1A1A1A]">
-            CRYSTAL<br/>CAVE
+            THE GREY<br/>THRONE
           </h3>
           <p className="text-[clamp(1.1rem,2.2vw,2.8rem)] font-bold max-w-xl leading-tight relative z-10 text-easter-lightpink">
-            The fragments of the first egg are scattered here. Can you piece it together?
+            The Grey King awaits. Shoot his armour, survive his counters, claim the Golden Egg.
           </p>
         </div>
 

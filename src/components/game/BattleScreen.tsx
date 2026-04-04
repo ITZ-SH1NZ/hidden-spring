@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGame } from "../../app/game/GameContext";
 
+const MOCK_ENEMY = { id: "mock", name: "The Hollow Hare", maxHp: 60, hp: 60, sprite: "boss", color: "#AAAAAA", mechanic: "tank" };
+
 export default function BattleScreen() {
-  const { currentEnemy, playerHp, playerMaxHp, takeDamage, endBattle, heal, timeRemaining, addCharge, resetCharge, ultimateCharge } = useGame();
-  
-  const [enemyHp, setEnemyHp] = useState(currentEnemy?.maxHp || 50);
+  const { currentEnemy: rawEnemy, playerHp, playerMaxHp, takeDamage, endBattle, heal, timeRemaining, addCharge, resetCharge, ultimateCharge } = useGame();
+  const currentEnemy = rawEnemy ?? MOCK_ENEMY;
+
+  const [enemyHp, setEnemyHp] = useState(currentEnemy.maxHp);
   const [turn, setTurn] = useState<"player" | "enemy" | "end">("player");
-  const [log, setLog] = useState<string[]>(["ENCOUNTER INITIATED: " + currentEnemy?.name]);
+  const [log, setLog] = useState<string[]>(["ENCOUNTER INITIATED: " + currentEnemy.name]);
   
   // Animation states
   const [playerAnim, setPlayerAnim] = useState("");
@@ -33,7 +36,7 @@ export default function BattleScreen() {
     if (action === "strike") {
       setPlayerAnim("attack");
       addCharge();
-      addLog("> You strike with the Carrot Blade.");
+      addLog("> You lunge with the Carrot Blade.");
       setTimeout(() => {
         const dmg = Math.floor(Math.random() * 10) + 20; // 20-30 dmg
         setEnemyHp(prev => Math.max(0, prev - dmg));
@@ -45,7 +48,7 @@ export default function BattleScreen() {
     else if (action === "bomb") {
       setPlayerAnim("attack");
       addCharge();
-      addLog("> You hurl a heavy Plasma Yolk.");
+      addLog("> You hurl a Plasma Yolk.");
       setTimeout(() => {
         const hits = Math.random() > 0.3;
         if (hits) {
@@ -67,12 +70,12 @@ export default function BattleScreen() {
     }
     else if (action === "glitch") {
       if (ultimateCharge < 3) {
-         addLog("> ERROR: INSUFFICIENT ENERGY FOR GLITCH.");
+         addLog("> SPRING MAGIC DEPLETED. CHARGE MORE.");
          return;
       }
       resetCharge();
       setPlayerAnim("magic");
-      addLog("> You hack the local matrix...");
+      addLog("> You unleash the Spring Glitch...");
       setTimeout(() => {
          const success = Math.random() > 0.3;
          if (success) {
@@ -88,7 +91,7 @@ export default function BattleScreen() {
              checkStateAfterPlayerTurn(dmg);
           }
          } else {
-           addLog(`>> Hack failed. Backfire!`);
+           addLog(`>> Spring magic overflowed. Backfire!`);
            takeDamage(10);
            checkStateAfterPlayerTurn(0);
          }
@@ -105,7 +108,7 @@ export default function BattleScreen() {
   useEffect(() => {
     if (enemyHp <= 0 && turn !== "end") {
       setTurn("end");
-      addLog(">> THREAT NEUTRALIZED.");
+      addLog(">> GUARDIAN DEFEATED. COLOUR RESTORED.");
       setTimeout(() => endBattle(true), 2000);
     }
   }, [enemyHp, turn, endBattle]);
@@ -113,7 +116,7 @@ export default function BattleScreen() {
   useEffect(() => {
     if (playerHp <= 0 && turn !== "end") {
       setTurn("end");
-      addLog(">> CRITICAL FAILURE. SYSTEM DOWN.");
+      addLog(">> SHELL SHATTERED. COLOUR FADING.");
       setTimeout(() => endBattle(false), 2000);
     }
   }, [playerHp, turn, endBattle]);
@@ -122,7 +125,7 @@ export default function BattleScreen() {
     if (turn === "enemy" && enemyHp > 0 && playerHp > 0) {
       setTimeout(() => {
         setEnemyAnim("attack");
-        addLog(`> ${currentEnemy?.name} executes [SWEEP]`);
+        addLog(`> ${currentEnemy?.name} lunges at you!`);
         
         setTimeout(() => {
           let dmg = Math.floor(Math.random() * 5) + 5; // 5-10 dmg
@@ -201,12 +204,52 @@ export default function BattleScreen() {
             }
             transition={{ duration: 0.3 }}
           >
-            {/* The Drone (Enemy) */}
-            <div className={`relative w-full h-full bg-[${currentEnemy?.color || '#FF0044'}] brutal-border drop-shadow-[0_0_30px_#FF0044] rotate-45 flex items-center justify-center`}>
-               <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
+            {/* Enemy Sprite — varies by mechanic */}
+            {currentEnemy?.mechanic === "tank" && (
+              /* The Hollow Hare — large grey bunny */
+              <div className="relative w-full h-full flex items-end justify-center" style={{ filter: `drop-shadow(0 0 20px #AAAAAA)` }}>
+                <div className="absolute top-0 left-[18%] w-[18%] h-[45%] bg-[#555] border border-white/20 rounded-t-full" />
+                <div className="absolute top-0 right-[18%] w-[18%] h-[45%] bg-[#555] border border-white/20 rounded-t-full" />
+                <div className="absolute bottom-0 w-[80%] h-[65%] bg-[#777] border-2 border-white/20 rounded-t-lg" />
+                <div className="absolute bottom-[30%] left-[22%] w-[18%] h-[18%] bg-black border border-white/60" />
+                <div className="absolute bottom-[30%] right-[22%] w-[18%] h-[18%] bg-black border border-white/60" />
+                <div className="absolute bottom-[18%] left-1/2 -translate-x-1/2 w-[35%] h-[4%] bg-white/30" />
+              </div>
+            )}
+            {currentEnemy?.mechanic === "evade" && (
+              /* The Rot — cracked dark egg */
+              <div className="relative w-full h-full flex items-center justify-center" style={{ filter: `drop-shadow(0 0 20px #7FBF3F)` }}>
+                <div className="absolute inset-[8%] bg-[#1A2A10] border-2 border-[#7FBF3F]/60 rounded-[50%_50%_50%_50%/60%_60%_40%_40%]" />
+                <div className="absolute top-[20%] left-1/2 w-[3px] h-[40%] bg-[#7FBF3F] rotate-[8deg] -translate-x-1/2" />
+                <div className="absolute top-[30%] left-[35%] w-[3px] h-[25%] bg-[#7FBF3F]/50 rotate-[-15deg]" />
+                <div className="absolute top-[22%] left-[25%] w-[14%] h-[14%] rounded-full bg-[#7FBF3F] animate-pulse" />
+                <div className="absolute top-[22%] right-[25%] w-[14%] h-[14%] rounded-full bg-[#7FBF3F] animate-pulse" />
+                <div className="absolute bottom-[18%] left-[30%] w-[8%] h-[15%] bg-[#7FBF3F]/40 rounded-b-full" />
+                <div className="absolute bottom-[18%] right-[35%] w-[6%] h-[10%] bg-[#7FBF3F]/30 rounded-b-full" />
+              </div>
+            )}
+            {currentEnemy?.mechanic === "drain" && (
+              /* The Frost Shell — spiky icy shell */
+              <div className="relative w-full h-full flex items-center justify-center" style={{ filter: `drop-shadow(0 0 20px #88CCFF)` }}>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[8%] h-[20%] bg-[#88CCFF]" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[8%] h-[20%] bg-[#88CCFF]" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[20%] h-[8%] bg-[#88CCFF]" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[20%] h-[8%] bg-[#88CCFF]" />
+                <div className="absolute top-[8%] left-[8%] w-[6%] h-[15%] bg-[#88CCFF]/60 rotate-45" />
+                <div className="absolute top-[8%] right-[8%] w-[6%] h-[15%] bg-[#88CCFF]/60 -rotate-45" />
+                <div className="absolute inset-[18%] rounded-full bg-[#050F18] border-2 border-[#88CCFF]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-[12%] h-[12%] rounded-full bg-[#88CCFF] animate-ping" />
+                </div>
+              </div>
+            )}
+            {!["tank","evade","drain"].includes(currentEnemy?.mechanic || "") && (
+              <div className="relative w-full h-full bg-[#FF0044] brutal-border rotate-45 flex items-center justify-center">
+                <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
                   <div className="w-4 h-4 bg-white rounded-full animate-ping" />
-               </div>
-            </div>
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
 
@@ -243,7 +286,7 @@ export default function BattleScreen() {
          {/* Actions Menu */}
          <div className="flex-1 flex flex-col gap-4">
             <div className="text-white/50 text-xs text-center border-b border-white/20 pb-2">
-              COMMAND MATRIX {turn === "player" ? "[AWAITING INPUT]" : "[PROCESSING...]"}
+              SPRING ARSENAL {turn === "player" ? "[YOUR MOVE]" : "[ENEMY MOVING...]"}
             </div>
             
             {/* Charge Bar */}
@@ -255,12 +298,12 @@ export default function BattleScreen() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 flex-1">
-              <button 
+              <button
                 onClick={() => handlePlayerAction("strike")}
                 disabled={turn !== "player"}
                 className={`border-2 border-white uppercase font-bold text-lg tracking-widest ${turn === "player" ? "hover:bg-white hover:text-black" : "opacity-30 cursor-not-allowed"} transition-colors`}
               >
-                SWORD
+                CARROT
               </button>
               <button 
                 onClick={() => handlePlayerAction("bomb")}

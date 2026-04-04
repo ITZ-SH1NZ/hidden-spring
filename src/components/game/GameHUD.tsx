@@ -18,8 +18,8 @@ export default function GameHUD() {
       
       {/* Left side: Terminal Log */}
       <div className="flex flex-col gap-1 font-mono text-sm font-bold uppercase tracking-widest pointer-events-auto">
-        <span className="opacity-50">SYS.OBSERVER_MODE // ACTIVE</span>
-        <span>SECTOR: {scene === 'level2_stealth' ? 'THE STEALTH MATRIX' : 'THE OVERWORLD'}</span>
+        <span className="opacity-50">SPRING.ACTIVE // COLOUR_CARRIER</span>
+        <span>WARREN: {scene === 'level2_stealth' ? 'THE HOLLOW WARREN' : scene === 'level3_runner' ? 'THE GREAT TUMBLE' : scene === 'level4_forge' ? 'THE FACTORY FLOOR' : scene === 'level5_boss' ? 'THE GREY THRONE' : 'THE HIDDEN GARDEN'}</span>
       </div>
 
       {scene === 'overworld' && (
@@ -28,7 +28,7 @@ export default function GameHUD() {
              const isDecrypted = idx < decryptedClueCount;
              return (
                <div key={idx} className={`p-2 lg:p-3 text-[10px] md:text-xs font-mono brutal-border ${isDecrypted ? 'bg-[#050505]/95 border-easter-green text-easter-green shadow-[0_0_15px_rgba(50,205,50,0.3)]' : 'bg-black/60 border-white/10 text-white/30 blur-[1px]'}`}>
-                 {isDecrypted ? `[DECRYPTED]: ${clue}` : `[LOCKED] KILL BOSS TO DECRYPT`}
+                 {isDecrypted ? `[REVEALED]: ${clue}` : `[SEALED] DEFEAT A GUARDIAN TO REVEAL`}
                </div>
              )
            })}
@@ -60,7 +60,7 @@ export default function GameHUD() {
           onClick={() => router.push('/')}
           className="font-mono text-sm font-bold border border-white px-4 py-2 hover:bg-white hover:text-black transition-colors"
         >
-          // EXIT_VAULT
+          // ESCAPE
         </button>
       </div>
       
