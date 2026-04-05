@@ -113,7 +113,7 @@ export default function Footer() {
               <EggSocial href="https://www.instagram.com/itz_sh1nz/" color="bg-easter-hotpink"><InstagramIcon /></EggSocial>
               <EggSocial href="https://www.linkedin.com/in/tejas-km-73436237b/" color="bg-easter-lightpink"><LinkedinIcon /></EggSocial>
               <EggSocial href="https://www.reddit.com/user/OkStudent3946" color="bg-easter-yellow"><RedditLogo /></EggSocial>
-              <EggSocial href="https://discord.gg/QWATFt6H" color="bg-easter-purple"><DiscordIcon /></EggSocial>
+              <EggSocial href="https://discord.gg/DpE3gq5e" color="bg-easter-purple"><DiscordIcon /></EggSocial>
             </div>
           </div>
         </div>
