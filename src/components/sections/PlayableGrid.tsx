@@ -1,17 +1,24 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { motion } from "framer-motion";
 import { playSound } from "@/utils/sound";
 
 // ── CSS Sprites ───────────────────────────────────────────────────────────────
 
 const PlayerSprite = () => (
   <div className="relative w-full h-full flex items-center justify-center">
-    <div className="absolute top-0 left-[28%] w-[18%] h-[38%] rounded-t-full" style={{ background: '#FFF', border: '2px solid #000' }} />
-    <div className="absolute top-0 right-[28%] w-[18%] h-[38%] rounded-t-full" style={{ background: '#FFF', border: '2px solid #000' }} />
-    <div className="absolute bottom-0 left-[10%] w-[80%] h-[65%] rounded-[50%_50%_50%_50%/40%_40%_60%_60%]" style={{ background: '#FFF', border: '2px solid #000' }} />
-    <div className="absolute rounded-full" style={{ width: '14%', height: '14%', background: '#FF69B4', bottom: '42%', left: '28%' }} />
-    <div className="absolute rounded-full" style={{ width: '14%', height: '14%', background: '#FF69B4', bottom: '42%', right: '28%' }} />
+    <div className="absolute top-0 left-[28%] w-[18%] h-[38%] rounded-t-full origin-bottom" style={{ background: '#FFF', border: '2px solid #000' }} />
+    <div className="absolute top-0 right-[28%] w-[18%] h-[38%] rounded-t-full origin-bottom" style={{ background: '#FFF', border: '2px solid #000' }} />
+    <motion.div 
+      className="absolute bottom-0 left-[10%] w-[80%] h-[65%] rounded-[50%_50%_50%_50%/40%_40%_60%_60%]" 
+      style={{ background: '#FFF', border: '2px solid #000', transformOrigin: 'bottom' }} 
+      animate={{ scaleY: [1, 0.95, 1], scaleX: [1, 1.02, 1] }}
+      transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+    >
+      <div className="absolute rounded-full" style={{ width: '15%', height: '15%', background: '#FF69B4', top: '15%', left: '20%' }} />
+      <div className="absolute rounded-full" style={{ width: '15%', height: '15%', background: '#FF69B4', top: '15%', right: '20%' }} />
+    </motion.div>
   </div>
 );
 
@@ -68,7 +75,6 @@ const MAP_TEMPLATE = [
 
 const COLS = MAP_TEMPLATE[0].length;
 const ROWS = MAP_TEMPLATE.length;
-const CELL = 36;
 
 interface EggCell { row: number; col: number; isSpring: boolean; cracked: boolean; colorIdx: number; }
 interface GuardPos { row: number; col: number; dir: number; }
@@ -253,81 +259,100 @@ export default function PlayableGrid() {
         <span className="text-white/30 hidden md:inline">[ARROWS] move · [SPACE] crack egg</span>
       </div>
 
-      {/* Canvas */}
+      {/* Canvas Box */}
       <div
-        className="relative z-10 select-none"
-        style={{ border: '4px solid #000', boxShadow: '6px 6px 0 #FF69B4', overflow: 'hidden', borderRadius: 24 }}
+        className="relative z-10 select-none w-full max-w-[800px] mx-auto overflow-hidden bg-black"
+        style={{ border: '4px solid #000', boxShadow: 'inset 0 10px 30px rgba(0,0,0,0.8), 8px 8px 0 #FF69B4', borderRadius: 24 }}
       >
-        {/* Static grid layer */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${COLS}, ${CELL}px)`,
-            gridTemplateRows: `repeat(${ROWS}, ${CELL}px)`,
-            background: '#0D0A06',
-            position: 'relative',
-          }}
-        >
-          {MAP_TEMPLATE.map((row, r) =>
-            row.split("").map((ch, c) => {
-              const isWall = ch === "W";
-              const egg = eggs.find(e => e.row === r && e.col === c);
-              return (
-                <div
-                  key={`${r}-${c}`}
-                  style={{
-                    width: CELL, height: CELL,
-                    background: isWall ? '#2A1F12' : (r + c) % 2 === 0 ? '#111008' : '#0D0A06',
-                    borderRight: isWall ? '1px solid #3A2A18' : undefined,
-                    borderBottom: isWall ? '1px solid #3A2A18' : undefined,
-                    position: 'relative',
-                  }}
-                >
-                  {egg && <EggSprite cracked={egg.cracked} isSpring={egg.isSpring} colorIdx={egg.colorIdx} />}
-                </div>
-              );
-            })
-          )}
-
-          {/* Guardians — absolutely positioned, CSS transition */}
-          {guards.map((g, i) => (
-            <div
-              key={`guard-${i}`}
-              style={{
-                position: 'absolute',
-                width: CELL, height: CELL,
-                top: g.row * CELL,
-                left: g.col * CELL,
-                transition: 'top 0.18s linear, left 0.18s linear',
-                pointerEvents: 'none',
-                zIndex: 2,
-              }}
-            >
-              <GuardianSprite />
-            </div>
-          ))}
-
-          {/* Player — absolutely positioned, CSS transition */}
+        {/* Responsive constraints container */}
+        <div style={{ position: 'relative', width: '100%', aspectRatio: `${COLS} / ${ROWS}` }}>
+          {/* Static grid layer */}
           <div
             style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${COLS}, 1fr)`,
+              gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+              background: '#0D0A06',
               position: 'absolute',
-              width: CELL, height: CELL,
-              top: player.row * CELL,
-              left: player.col * CELL,
-              transition: 'top 0.1s ease-out, left 0.1s ease-out',
-              zIndex: 3,
+              inset: 0,
             }}
           >
-            <PlayerSprite />
-            {nearEgg && (
-              <div style={{
-                position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)',
-                background: '#FFD700', color: '#000', fontSize: 8, fontWeight: 900,
-                padding: '1px 5px', border: '1px solid #000', borderRadius: 3, whiteSpace: 'nowrap',
-              }}>
-                SPACE
-              </div>
+            {MAP_TEMPLATE.map((row, r) =>
+              row.split("").map((ch, c) => {
+                const isWall = ch === "W";
+                const egg = eggs.find(e => e.row === r && e.col === c);
+                // Checkerboard pattern scaled down
+                return (
+                  <div
+                    key={`${r}-${c}`}
+                    style={{
+                      background: isWall ? '#2A1F12' : (r + c) % 2 === 0 ? '#111008' : '#0D0A06',
+                      borderRight: isWall ? '1px solid #3A2A18' : undefined,
+                      borderBottom: isWall ? '1px solid #3A2A18' : undefined,
+                      position: 'relative',
+                    }}
+                  >
+                    {egg && <EggSprite cracked={egg.cracked} isSpring={egg.isSpring} colorIdx={egg.colorIdx} />}
+                  </div>
+                );
+              })
             )}
+
+            {/* Dynamic Lighting Glow behind player */}
+            <motion.div
+              animate={{ left: `${(player.col + 0.5) * (100 / COLS)}%`, top: `${(player.row + 0.5) * (100 / ROWS)}%` }}
+              transition={{ type: "spring", stiffness: 150, damping: 20 }}
+              style={{
+                position: 'absolute',
+                width: '300%', height: '300%',
+                background: 'radial-gradient(circle closest-side, rgba(255,105,180,0.12) 0%, rgba(255,105,180,0.05) 30%, transparent 100%)',
+                transform: 'translate(-50%, -50%)',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}
+            />
+
+            {/* Guardians */}
+            {guards.map((g, i) => (
+              <motion.div
+                key={`guard-${i}`}
+                animate={{ top: `${(g.row / ROWS) * 100}%`, left: `${(g.col / COLS) * 100}%` }}
+                transition={{ type: "spring", stiffness: 120, damping: 14 }}
+                style={{
+                  position: 'absolute',
+                  width: `${100 / COLS}%`, height: `${100 / ROWS}%`,
+                  pointerEvents: 'none',
+                  zIndex: 2,
+                }}
+              >
+                <GuardianSprite />
+              </motion.div>
+            ))}
+
+            {/* Player */}
+            <motion.div
+              animate={{ top: `${(player.row / ROWS) * 100}%`, left: `${(player.col / COLS) * 100}%` }}
+              transition={{ type: "spring", stiffness: 160, damping: 16 }}
+              style={{
+                position: 'absolute',
+                width: `${100 / COLS}%`, height: `${100 / ROWS}%`,
+                zIndex: 3,
+              }}
+            >
+              <PlayerSprite />
+              {nearEgg && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{
+                  position: 'absolute', top: '-40%', left: '50%', transform: 'translateX(-50%)',
+                  background: '#FFD700', color: '#000', fontSize: '60%', fontWeight: 900,
+                  padding: '2px 6px', border: '2px solid #000', borderRadius: 4, whiteSpace: 'nowrap',
+                }}>
+                  SPACE
+                </motion.div>
+              )}
+            </motion.div>
           </div>
         </div>
 

@@ -49,6 +49,16 @@ export default function Home() {
   // Scroll progress bar
   const [scrollPct, setScrollPct] = useState(0);
 
+  // Mobile check for performance
+  const [isMobile, setIsMobile] = useState(true); // default true for safe SSR
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // set initial value
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Konami
   const [konamiActive, setKonamiActive] = useState(false);
   const konamiBuf = useRef<string[]>([]);
@@ -131,7 +141,7 @@ export default function Home() {
         messages={["Entering the warren...", "Waking the Grey King...", "Loading the garden...", "Arming the Easter Bug...", "Almost there..."]}
       />
     )}
-    <main ref={mainRef} className="bg-[#1A1A1A] w-full min-h-screen">
+    <main ref={mainRef} className="bg-[#1A1A1A] w-full min-h-screen relative z-10">
 
       {/* Scroll Progress Bar */}
       <div
@@ -216,7 +226,7 @@ export default function Home() {
         {/* Background ambient light */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-easter-blue opacity-5 blur-[100px] pointer-events-none" />
 
-        <motion.div style={{ skewY: velocitySkew }} className="max-w-7xl mx-auto relative z-10">
+        <motion.div style={isMobile ? {} : { skewY: velocitySkew }} className="max-w-7xl mx-auto relative z-10">
           <div className="mb-20 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 hover:[&>div]:!skew-y-0 transition-transform duration-300">
             
             {/* Bento 1: Large Intro */}
@@ -293,7 +303,7 @@ export default function Home() {
       <PlayableGrid />
 
       {/* --- FOOTER CTA --- */}
-      <section id="play" className="relative w-full min-h-screen bg-easter-yellow flex flex-col items-center justify-center text-center px-4 rounded-t-[60px] md:rounded-t-[100px] z-20 mt-[-40px]">
+      <section id="play" className="relative w-full min-h-screen bg-easter-yellow flex flex-col items-center justify-center text-center px-4 rounded-t-[60px] md:rounded-t-[100px] rounded-b-[40px] md:rounded-b-[80px] z-20 mt-[-40px] shadow-[0_40px_100px_rgba(0,0,0,0.9)]">
         <div className="max-w-4xl mx-auto flex flex-col items-center">
           <h2 className="text-[clamp(4rem,10vw,10rem)] font-black text-gray-900 leading-[0.9] mb-12 tracking-tighter text-outline-sm drop-shadow-[0_8px_0_#FF69B4]">
             HATCH IT.
@@ -304,11 +314,10 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer />
-      
       {/* Global Noise Applied via CSS */}
-      <div className="noise-overlay" />
+      <div className="noise-overlay pointer-events-none" />
     </main>
+    <Footer />
     </>
   );
 }

@@ -33,22 +33,38 @@ const EggSocial = ({ href, children, color }: { href: string; children: React.Re
 
 export default function Footer() {
   const footerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: footerRef,
-    offset: ["start end", "end end"]
-  });
+  const [height, setHeight] = useState(0);
+  const [windowHeight, setWindowHeight] = useState(0);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWindowHeight(window.innerHeight);
+      const handleResize = () => setWindowHeight(window.innerHeight);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (footerRef.current) {
+      setHeight(footerRef.current.offsetHeight);
+      const ro = new ResizeObserver(() => {
+        if (footerRef.current) {
+          setHeight(footerRef.current.offsetHeight);
+        }
+      });
+      ro.observe(footerRef.current);
+      return () => ro.disconnect();
+    }
+  }, []);
+
+  const isSticky = height > 0 && windowHeight > 0 && height <= windowHeight;
 
   return (
-    <footer ref={footerRef} className="relative w-full bg-[#1A1A1A] text-white pt-32 pb-12 px-6 md:px-12 overflow-hidden z-20">
+    <div style={{ height: isSticky ? height : 'auto' }} className="relative w-full z-0 bg-[#1A1A1A]">
+      <footer ref={footerRef} className={`${isSticky ? 'fixed bottom-0' : 'relative'} left-0 w-full bg-[#1A1A1A] text-white pt-16 pb-12 px-6 md:px-12 overflow-hidden pointer-events-auto`}>
       
-      {/* Brutalist Sawtooth Divider with Shadow */}
-      <div className="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180 pointer-events-none drop-shadow-[0_-8px_10px_rgba(0,0,0,0.5)]">
-        <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="relative block w-full h-[45px] fill-easter-yellow" style={{ transform: 'translateY(2px)' }}>
-           <polygon points="0,20 0,0 5,15 10,0 15,15 20,0 25,15 30,0 35,15 40,0 45,15 50,0 55,15 60,0 65,15 70,0 75,15 80,0 85,15 90,0 95,15 100,0 100,20" />
-        </svg>
-      </div>
-
-      <div className="max-w-7xl mx-auto flex flex-col gap-12">
+        <div className="max-w-7xl mx-auto flex flex-col gap-12">
         
         {/* Top Segment: Title and Socials */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
@@ -137,7 +153,8 @@ export default function Footer() {
            <span>Terms of Serv</span>
         </div>
       </div>
-
+      <div className="noise-overlay pointer-events-none" />
     </footer>
+    </div>
   );
 }

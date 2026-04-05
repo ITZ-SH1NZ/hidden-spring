@@ -289,9 +289,19 @@ export default function Level2Stealth() {
 
                      {/* Burrow exit door */}
                      {cell === 9 && (
-                        <div className={`w-full h-full border-2 transition-all duration-1000 flex items-center justify-center ${doorOpen ? 'border-easter-green/60 bg-easter-green/10' : 'border-easter-yellow bg-easter-yellow/80'}`}>
-                           {!doorOpen && <div className="w-[30%] h-[40%] rounded-full border border-black/40 bg-black/20" />}
-                           {doorOpen && <div className="w-[30%] h-[40%] rounded-full border border-easter-green/60 animate-ping" />}
+                        <div className="relative w-full h-full">
+                           {/* Floating Bouncing Arrow Indicator */}
+                           {doorOpen && (
+                              <div className="absolute top-[-100%] left-1/2 -translate-x-1/2 z-50 animate-bounce pointer-events-none drop-shadow-[0_0_10px_#32CD32]">
+                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-8 h-8 md:w-10 md:h-10 text-easter-green">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                 </svg>
+                              </div>
+                           )}
+                           <div className={`w-full h-full border-2 transition-all duration-1000 flex items-center justify-center relative z-10 ${doorOpen ? 'border-easter-green/60 bg-easter-green/10 shadow-[0_0_20px_#32CD32_inset]' : 'border-easter-yellow bg-easter-yellow/80'}`}>
+                              {!doorOpen && <div className="w-[30%] h-[40%] rounded-full border border-black/40 bg-black/20" />}
+                              {doorOpen && <div className="w-[30%] h-[40%] rounded-full border border-easter-green/60 animate-ping" />}
+                           </div>
                         </div>
                      )}
                   </div>
