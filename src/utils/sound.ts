@@ -15,6 +15,7 @@ export type SoundType =
   | "boss_hit"
   | "boss_phase"
   | "ui_click"
+  | "ui_hover"
   | "pause"
   | "konami"
   | "stealth_caught"
@@ -200,6 +201,11 @@ export function playSound(type: SoundType): void {
       case "ui_click":
         // Tick: 1200Hz sine, 20ms
         playNote(1200, 0.02, "sine", 0, 0.2, 0.001);
+        break;
+
+      case "ui_hover":
+        // Soft low tick: 800Hz sine, 15ms, low volume
+        playNote(800, 0.015, "sine", 0, 0.08, 0.001);
         break;
 
       case "pause":

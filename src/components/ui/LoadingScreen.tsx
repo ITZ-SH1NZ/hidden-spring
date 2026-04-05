@@ -23,6 +23,10 @@ export default function LoadingScreen({ onComplete, messages }: LoadingScreenPro
   ];
 
   useEffect(() => {
+    if (!onComplete && typeof window !== "undefined") {
+      sessionStorage.removeItem("hs:loaded");
+    }
+    
     setStatusText(statusMessages[0]);
     const duration = 2800;
     const interval = 30;
@@ -49,6 +53,7 @@ export default function LoadingScreen({ onComplete, messages }: LoadingScreenPro
           } else {
             // Default: signal landing page components after the wipe-up finishes
             setTimeout(() => {
+              sessionStorage.setItem('hs:loaded', '1');
               window.dispatchEvent(new CustomEvent('hiddenspring:loaded'));
             }, 1050);
           }

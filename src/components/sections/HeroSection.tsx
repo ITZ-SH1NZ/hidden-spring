@@ -48,11 +48,15 @@ const CarrotSVG = () => (
 
 export default function HeroSection({ onPlay }: { onPlay?: () => void }) {
   const heroRef = useRef<HTMLDivElement>(null);
-  const [pageReady, setPageReady] = useState(false);
+  const [pageStatus, setPageStatus] = useState<"hidden" | "show" | "instant">("hidden");
   const router = useRouter();
 
   useEffect(() => {
-    const onLoaded = () => setPageReady(true);
+    if (sessionStorage.getItem('hs:loaded') === '1') {
+      setPageStatus("instant");
+      return;
+    }
+    const onLoaded = () => setPageStatus("show");
     window.addEventListener('hiddenspring:loaded', onLoaded);
     return () => window.removeEventListener('hiddenspring:loaded', onLoaded);
   }, []);
@@ -74,12 +78,14 @@ export default function HeroSection({ onPlay }: { onPlay?: () => void }) {
 
   const containerVars = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 1.0 } }
+    show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 1.0 } },
+    instant: { opacity: 1, transition: { staggerChildren: 0, delayChildren: 0 } }
   };
 
   const charVars = {
     hidden: { y: 150, opacity: 0, rotate: 15 },
-    show: { y: 0, opacity: 1, rotate: 0, transition: { type: "spring" as const, stiffness: 100, damping: 10 } }
+    show: { y: 0, opacity: 1, rotate: 0, transition: { type: "spring" as const, stiffness: 100, damping: 10 } },
+    instant: { y: 0, opacity: 1, rotate: 0, transition: { duration: 0 } }
   };
 
   return (
@@ -151,7 +157,7 @@ export default function HeroSection({ onPlay }: { onPlay?: () => void }) {
         <div className="relative mb-8 w-full max-w-[100vw] overflow-visible">
           {/* Main Animated Title */}
           <motion.h1 
-            variants={containerVars} initial="hidden" animate={pageReady ? "show" : "hidden"}
+            variants={containerVars} initial="hidden" animate={pageStatus}
             className="text-[clamp(3.5rem,14vw,14rem)] font-black leading-[0.8] tracking-tighter text-white relative z-50 py-4 drop-shadow-[0_8px_0_rgba(0,0,0,0.2)] flex flex-wrap justify-center"
           >
             {"HIDDEN".split("").map((c, i) => <motion.span variants={charVars} key={i} className="inline-block text-outline-sm md:text-outline">{c}</motion.span>)}

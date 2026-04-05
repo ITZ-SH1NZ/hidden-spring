@@ -343,8 +343,8 @@ export default function Level5Boss() {
        )}
 
        {phase === 1.5 && (
-       <div className="absolute inset-0 bg-black flex flex-col items-center justify-center p-8 z-50 animate-in fade-in zoom-in-95 duration-500">
-           <div className="text-white text-center font-mono max-w-lg space-y-6 brutal-border border-white/20 p-8 bg-[#050505]">
+       <div className="absolute inset-0 bg-black flex flex-col items-center justify-start overflow-y-auto py-8 px-8 z-50 animate-in fade-in zoom-in-95 duration-500">
+           <div className="text-white text-center font-mono max-w-lg space-y-6 brutal-border border-white/20 p-8 bg-[#050505] m-auto">
               <div className="text-white/50 tracking-[0.2em] mb-8 animate-pulse">[ GREY KING ALERT ]</div>
               
               <div className="text-easter-green font-black text-xl md:text-2xl tracking-widest min-h-[120px] flex items-center justify-center">

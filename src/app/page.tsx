@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useVelocity, useSpring, useTransform } from "framer-motion";
 import { playSound } from "@/utils/sound";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -40,6 +40,11 @@ const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRi
 export default function Home() {
   const mainRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 400 });
+  const velocitySkew = useTransform(smoothVelocity, [-1000, 0, 1000], [-3, 0, 3]);
 
   // Scroll progress bar
   const [scrollPct, setScrollPct] = useState(0);
@@ -176,18 +181,26 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* GLASSS NAV */}
       <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-[100] mix-blend-difference text-white pointer-events-none">
-        <a href="#hero" onClick={(e) => handleScroll(e, '#hero')} className="nav-item flex items-center gap-3 font-black text-2xl tracking-tighter pointer-events-auto hover:opacity-80 transition-opacity">
+        <a href="#hero" onClick={(e) => handleScroll(e, '#hero')} onMouseEnter={() => playSound("ui_hover")} className="nav-item flex items-center gap-3 font-black text-2xl tracking-tighter pointer-events-auto hover:opacity-80 transition-opacity">
           <img src="/logo.svg" alt="" className="w-8 h-8 object-contain" />
           <span>HIDDEN SPRING</span>
         </a>
         <div className="nav-item hidden md:flex gap-8 font-bold uppercase tracking-widest text-sm pointer-events-auto">
-          <a href="#about" onClick={(e) => handleScroll(e, '#about')} className="hover:opacity-50 transition-opacity">About</a>
-          <a href="#explore" onClick={(e) => handleScroll(e, '#explore')} className="hover:opacity-50 transition-opacity">Explore</a>
-          <a href="#play" onClick={(e) => handleScroll(e, '#play')} className="hover:opacity-50 transition-opacity">Play</a>
+          <a href="#about" onClick={(e) => handleScroll(e, '#about')} onMouseEnter={() => playSound("ui_hover")} className="relative group overflow-hidden py-1">
+            <span className="relative z-10">About</span>
+            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></span>
+          </a>
+          <a href="#explore" onClick={(e) => handleScroll(e, '#explore')} onMouseEnter={() => playSound("ui_hover")} className="relative group overflow-hidden py-1">
+            <span className="relative z-10">Explore</span>
+            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></span>
+          </a>
+          <a href="#play" onClick={(e) => handleScroll(e, '#play')} onMouseEnter={() => playSound("ui_hover")} className="relative group overflow-hidden py-1">
+            <span className="relative z-10">Play</span>
+            <span className="absolute bottom-0 left-0 w-full h-[2px] bg-white scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></span>
+          </a>
         </div>
-        <div className="nav-item pointer-events-auto">
+        <div className="nav-item pointer-events-auto" onMouseEnter={() => playSound("ui_hover")}>
           <MagneticButton onClick={goToGame} color="black" className="px-6 py-2 text-sm !border-2 !border-white/50 hover:!border-white transition-colors bg-black/80 backdrop-blur-md">Play Now</MagneticButton>
         </div>
       </nav>
@@ -203,11 +216,11 @@ export default function Home() {
         {/* Background ambient light */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] bg-easter-blue opacity-5 blur-[100px] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="mb-20 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+        <motion.div style={{ skewY: velocitySkew }} className="max-w-7xl mx-auto relative z-10">
+          <div className="mb-20 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 hover:[&>div]:!skew-y-0 transition-transform duration-300">
             
             {/* Bento 1: Large Intro */}
-            <div className="md:col-span-8 bg-easter-yellow text-gray-900 rounded-[40px] p-8 md:p-16 flex flex-col justify-between min-h-[400px] border-4 border-black brutal-shadow transition-transform hover:-translate-y-2">
+            <div onMouseEnter={() => playSound("ui_hover")} className="md:col-span-8 bg-easter-yellow text-gray-900 rounded-[40px] p-8 md:p-16 flex flex-col justify-between min-h-[400px] border-4 border-black brutal-shadow transition-transform hover:-translate-y-2">
               <div>
                 <span className="px-4 py-1 border-2 border-black rounded-full font-bold uppercase text-sm mb-6 inline-block">The Vision</span>
                 <h2 className="text-[clamp(2rem,4vw,4rem)] font-black leading-[1.1] mb-6 max-w-2xl">
@@ -220,7 +233,7 @@ export default function Home() {
             </div>
 
             {/* Bento 2: Image/Color Block */}
-            <div className="md:col-span-4 bg-easter-pink rounded-[40px] p-10 min-h-[400px] flex items-center justify-center relative overflow-hidden group border-4 border-black brutal-shadow transition-transform hover:-translate-y-2">
+            <div onMouseEnter={() => playSound("ui_hover")} className="md:col-span-4 bg-easter-pink rounded-[40px] p-10 min-h-[400px] flex items-center justify-center relative overflow-hidden group border-4 border-black brutal-shadow transition-transform hover:-translate-y-2">
               <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
               <div className="text-[12rem] filter drop-shadow-2xl group-hover:scale-125 group-hover:rotate-12 transition-transform duration-700 ease-elastic origin-center">
                 <GiantBunnySVG />
@@ -233,7 +246,7 @@ export default function Home() {
               { color: "bg-easter-purple", icon: <PaletteSVG className="w-16 h-16" />, title: "CSS Sprites", desc: "Every enemy hand-built in code — no image files." },
               { color: "bg-easter-green", icon: <AudioSVG className="w-16 h-16" />, title: "Boss Fight", desc: "Face the Grey King across 3 brutal phases." }
             ].map((card, idx) => (
-              <div key={idx} className={`md:col-span-4 ${card.color} rounded-[40px] p-10 min-h-[300px] flex flex-col justify-end group border-4 border-black brutal-shadow transition-transform hover:-translate-y-2 text-gray-900`}>
+              <div key={idx} onMouseEnter={() => playSound("ui_hover")} className={`md:col-span-4 ${card.color} rounded-[40px] p-10 min-h-[300px] flex flex-col justify-end group border-4 border-black brutal-shadow transition-transform hover:-translate-y-2 text-gray-900`}>
                 <div className="mb-auto group-hover:-translate-y-4 group-hover:scale-110 transition-transform duration-300 origin-bottom-left stroke-black stroke-[3px] text-white">
                   {card.icon}
                 </div>
@@ -242,7 +255,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* --- HORIZONTAL EXPLORE --- */}
