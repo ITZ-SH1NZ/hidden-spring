@@ -86,13 +86,27 @@ export default function RPGOverworld() {
     // Generate Clues ONLY on fresh run
     if (gameClues.length === 0 && correctEgg) {
        const clues = [];
-       if (correctEgg.y < MAP_HEIGHT / 2) clues.push("The Spring Egg is hidden in the NORTHERN part of the garden.");
-       else clues.push("The Spring Egg is hidden in the SOUTHERN part of the garden.");
+       
+       // Clue 1: Broad Compass Direction
+       if (correctEgg.y <= 3) clues.push("The Spring Egg rests in the far Northern reaches of the Warren.");
+       else if (correctEgg.x > 12) clues.push("The Spring Egg is located on the Eastern border of the maze.");
+       else if (correctEgg.x < 5) clues.push("The Spring Egg is located on the far Western edge.");
+       else clues.push("The Spring Egg is hidden right in the Center of the garden ruins.");
 
-       if (correctEgg.x < MAP_WIDTH / 2) clues.push("It rests on the WEST side of the garden.");
-       else clues.push("It rests on the EAST side of the garden.");
+       // Clue 2: Precise Landmark Context
+       if (correctEgg.x === 5 && correctEgg.y === 1) clues.push("It is tucked inside a narrow upper-left alcove.");
+       else if (correctEgg.x === 15 && correctEgg.y === 1) clues.push("It sits in the uppermost right corner of the ruins.");
+       else if (correctEgg.x === 15 && correctEgg.y === 6) clues.push("You must navigate the winding eastern labyrinth paths to find it.");
+       else if (correctEgg.x === 9 && correctEgg.y === 7) clues.push("It is heavily surrounded by a thick block of protective walls.");
+       else if (correctEgg.x === 1 && correctEgg.y === 8) clues.push("It lies crushed directly against the harsh western boundary wall.");
+       else clues.push("It is completely obscured by the surrounding maze geometry.");
 
-       clues.push("Scouts report it sits alone, away from the guardians.");
+       // Clue 3: Boss Proximity Danger
+       if (correctEgg.x < 10 && correctEgg.y < 5) clues.push("Beware: The Sentinel patrols very close to its location.");
+       else if (correctEgg.x > 10 && correctEgg.y < 5) clues.push("Beware: The Firewall rigidly guards the perimeter around it.");
+       else if (correctEgg.x > 10 && correctEgg.y >= 5) clues.push("Beware: The Glitch actively corrupts the data nearby.");
+       else if (correctEgg.x === 9 && correctEgg.y === 7) clues.push("Beware: You must slip stealthily between multiple boss domains to reach the center.");
+       else clues.push("Beware: You may have to face multiple guardians to reach its isolated path.");
 
        setGameClues(clues);
     }

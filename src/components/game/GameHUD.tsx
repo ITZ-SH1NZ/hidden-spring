@@ -104,18 +104,7 @@ export default function GameHUD() {
         <span>WARREN: {scene === 'level2_stealth' ? 'THE HOLLOW WARREN' : scene === 'level3_runner' ? 'THE GREAT TUMBLE' : scene === 'level4_forge' ? 'THE FACTORY FLOOR' : scene === 'level5_boss' ? 'THE GREY THRONE' : 'THE HIDDEN GARDEN'}</span>
       </div>
 
-      {scene === 'overworld' && (
-        <div className="absolute bottom-6 left-6 flex flex-col gap-2 max-w-xs xl:max-w-md pointer-events-auto mix-blend-normal z-[110]">
-          {gameClues && gameClues.map((clue, idx) => {
-            const isDecrypted = idx < decryptedClueCount;
-            return (
-              <div key={idx} className={`p-2 lg:p-3 text-[10px] md:text-xs font-mono brutal-border ${isDecrypted ? 'bg-[#050505]/95 border-easter-green text-easter-green shadow-[0_0_15px_rgba(50,205,50,0.3)]' : 'bg-black/60 border-white/10 text-white/30 blur-[1px]'}`}>
-                {isDecrypted ? `[REVEALED]: ${clue}` : `[SEALED] DEFEAT A GUARDIAN TO REVEAL`}
-              </div>
-            );
-          })}
-        </div>
-      )}
+
 
       {/* Right side: Warren Pips + Timer & Settings */}
       <div className="flex flex-col items-end gap-4 pointer-events-auto mix-blend-normal">
@@ -180,6 +169,19 @@ export default function GameHUD() {
       </div>
 
     </div>
+
+      {scene === 'overworld' && (
+        <div className="fixed bottom-2 left-1/2 -translate-x-1/2 md:absolute md:bottom-6 md:left-6 md:translate-x-0 w-[150px] md:w-auto md:max-w-xs xl:max-w-md flex flex-col gap-1.5 md:gap-2 pointer-events-auto mix-blend-normal z-[9999] md:z-[110]">
+          {gameClues && gameClues.map((clue, idx) => {
+            const isDecrypted = idx < decryptedClueCount;
+            return (
+              <div key={idx} className={`p-1.5 md:p-3 text-[8px] leading-[10px] md:text-xs md:leading-normal font-mono brutal-border ${isDecrypted ? 'bg-[#0A0A0A]/95 border-easter-green text-easter-green shadow-[0_0_15px_rgba(50,205,50,0.3)]' : 'bg-black/60 border-white/10 text-white/30 blur-[0.5px] md:blur-[1px]'}`}>
+                {isDecrypted ? `[REVEALED]: ${clue}` : `[SEALED] DEFEAT A GUARDIAN FIRST`}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </>
   );
 }

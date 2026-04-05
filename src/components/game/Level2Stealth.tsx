@@ -26,6 +26,7 @@ const LEVEL2_MAP = [
 
 const MAP_HEIGHT = LEVEL2_MAP.length;
 const MAP_WIDTH = LEVEL2_MAP[0].length;
+const TILE_SIZE = 64;
 
 type Dir = "up" | "down" | "left" | "right";
 interface Drone {
@@ -232,10 +233,15 @@ export default function Level2Stealth() {
   };
 
 
+  const windowHalfW = typeof window !== 'undefined' ? window.innerWidth / 2 : 500;
+  const windowHalfH = typeof window !== 'undefined' ? window.innerHeight / 2 : 500;
+  const cameraX = windowHalfW - (playerPos.x * TILE_SIZE + TILE_SIZE/2);
+  const cameraY = windowHalfH - (playerPos.y * TILE_SIZE + TILE_SIZE/2);
+
   return (
-    <div className="absolute inset-0 flex items-center justify-center font-mono" style={{ backgroundColor: '#0D0A06' }}>
+    <div className="absolute inset-0 overflow-hidden font-mono" style={{ backgroundColor: '#0D0A06' }}>
        {/* Warren earth texture overlay */}
-       <div className="absolute inset-0 pointer-events-none opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(101,67,33,0.3) 38px, rgba(101,67,33,0.3) 40px), repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(101,67,33,0.15) 78px, rgba(101,67,33,0.15) 80px)' }} />
+       <div className="absolute inset-0 pointer-events-none opacity-20 z-50" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(101,67,33,0.3) 38px, rgba(101,67,33,0.3) 40px), repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(101,67,33,0.15) 78px, rgba(101,67,33,0.15) 80px)' }} />
 
        <div className="absolute bottom-6 right-6 text-right z-[120]">
           <div className="text-easter-green text-3xl font-black drop-shadow-[0_0_10px_#32CD32]">
@@ -244,18 +250,49 @@ export default function Level2Stealth() {
           <div className="text-white/50 text-sm tracking-widest bg-black/60 px-2 py-1 brutal-border border-white/10 backdrop-blur-sm mt-1">COLOUR NODES BLOOMING</div>
        </div>
 
-       <div className="relative border-4 border-[#3D2B1F]/60 brutal-shadow p-2" style={{ backgroundColor: '#100C07' }}>
-          {/* Map Grid */}
-          <div
-             className="grid gap-[2px]"
-             style={{
-               gridTemplateColumns: `repeat(${MAP_WIDTH}, minmax(0, 1fr))`,
-               backgroundColor: 'rgba(101,67,33,0.08)'
-             }}
-          >
+       {/* Mobile Action Minimap - Docked between joypad controls strictly on Mobile */}
+       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[140px] h-[100px] bg-[#0A0A0A] border-2 border-white/10 z-[9999] p-1 flex md:hidden pointer-events-none drop-shadow-2xl">
+          <div className="w-full h-full grid gap-[1px]" style={{ gridTemplateColumns: `repeat(${MAP_WIDTH}, minmax(0, 1fr))` }}>
+             {LEVEL2_MAP.map((row, y) =>
+                row.map((cell, x) => {
+                   const isActiveTerminal = activeTerminals.includes(terminals.find(t => t.x === x && t.y === y)?.id || "");
+                   const isPlayer = playerPos.x === x && playerPos.y === y;
+                   let bgColor = 'transparent';
+                   if (isPlayer) bgColor = '#FF69B4'; // Player = Pink
+                   else if (cell === 1) bgColor = 'rgba(255,255,255,0.1)'; // Wall = faint outline
+                   else if (cell === 8) bgColor = isActiveTerminal ? '#32CD32' : '#FF69B4'; // Uncollected node pulses pink
+                   else if (cell === 9) bgColor = doorOpen ? '#32CD32' : 'transparent'; // Exit
+                   
+                   return (
+                     <div 
+                       key={`m-${x}-${y}`} 
+                       className={cell === 8 && !isActiveTerminal ? "animate-pulse" : ""}
+                       style={{ backgroundColor: bgColor }} 
+                     />
+                   );
+                })
+             )}
+          </div>
+       </div>
+
+       <motion.div 
+         className="absolute top-0 left-0"
+         animate={{ x: cameraX, y: cameraY }}
+         transition={{ type: "tween", ease: "linear", duration: 0.15 }}
+       >
+          {/* Map Base */}
+          <div className="absolute border-4 border-[#3D2B1F]/60" style={{ width: MAP_WIDTH * TILE_SIZE, height: MAP_HEIGHT * TILE_SIZE, backgroundColor: 'rgba(101,67,33,0.08)' }}>
+             {/* Tiles */}
              {LEVEL2_MAP.map((row, y) =>
                row.map((cell, x) => (
-                  <div key={`${x}-${y}`} className="w-8 h-8 md:w-[42px] md:h-[42px] relative flex items-center justify-center">
+                  <div 
+                     key={`${x}-${y}`} 
+                     className="absolute flex items-center justify-center"
+                     style={{
+                        width: TILE_SIZE, height: TILE_SIZE,
+                        left: x * TILE_SIZE, top: y * TILE_SIZE
+                     }}
+                  >
                      {/* Warren wall — earthy packed dirt */}
                      {cell === 1 && (
                         <div className="w-full h-full border border-[#3D2B1F]/60" style={{ backgroundColor: '#2A1F12' }}>
@@ -314,10 +351,11 @@ export default function Level2Stealth() {
              return (
                <motion.div
                  key={d.id}
-                 className="absolute top-2 left-2 w-8 h-8 md:w-[42px] md:h-[42px] pointer-events-none flex items-center justify-center z-20"
+                 className="absolute pointer-events-none flex items-center justify-center z-20"
+                 style={{ width: TILE_SIZE, height: TILE_SIZE }}
                  animate={{
-                    x: d.x * (typeof window !== 'undefined' && window.innerWidth >= 768 ? 44 : 34),
-                    y: d.y * (typeof window !== 'undefined' && window.innerWidth >= 768 ? 44 : 34)
+                    x: d.x * TILE_SIZE,
+                    y: d.y * TILE_SIZE
                  }}
                  transition={{ duration: 0.7, ease: "linear" }}
                >
@@ -350,10 +388,11 @@ export default function Level2Stealth() {
 
           {/* Player Avatar */}
           <motion.div
-             className="absolute top-2 left-2 w-8 h-8 md:w-[42px] md:h-[42px] pointer-events-none flex items-center justify-center z-30"
+             className="absolute pointer-events-none flex items-center justify-center z-30"
+             style={{ width: TILE_SIZE, height: TILE_SIZE }}
              animate={{
-                x: playerPos.x * (typeof window !== 'undefined' && window.innerWidth >= 768 ? 44 : 34),
-                y: playerPos.y * (typeof window !== 'undefined' && window.innerWidth >= 768 ? 44 : 34)
+                x: playerPos.x * TILE_SIZE,
+                y: playerPos.y * TILE_SIZE
              }}
              transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
@@ -369,7 +408,7 @@ export default function Level2Stealth() {
                 <div className="absolute top-[-4px] right-[20%] w-2 h-4 bg-easter-hotpink rounded-t-full border border-white" />
              </div>
           </motion.div>
-       </div>
+       </motion.div>
     </div>
   );
 }
